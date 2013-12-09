@@ -35,7 +35,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = sniffer.o avclandrv.o com232.o const.o delay2.o 
+OBJECTS = sniffer.o avclandrv.o com232.o const.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -56,8 +56,6 @@ com232.o: ../com232.c
 const.o: ../const.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
-delay2.o: ../delay2.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link
 $(TARGET): $(OBJECTS)

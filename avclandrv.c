@@ -27,8 +27,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+#include <util/delay.h>
 #include "timer.h"
-#include "delay2.h"
 #include "avclandrv.h"
 #include "com232.h"
 #include "const.h"
@@ -228,10 +228,10 @@ u08 AVCLan_Read_Byte(u08 length)
 u08 AVCLan_Send_StartBit()
 {
  AVC_SET_1();
- delay1(166);
+ _delay_us(166);
  
  AVC_SET_0();
- delay1(30);
+ _delay_us(30);
 
  return 1;
 }
@@ -239,19 +239,19 @@ u08 AVCLan_Send_StartBit()
 void AVCLan_Send_Bit1()
 {
  AVC_SET_1();
- delay1(20);
+ _delay_us(20);
 
  AVC_SET_0();
- delay1(16);							// 12-21
+ _delay_us(16);							// 12-21
 }
 //------------------------------------------------------------------------------
 void AVCLan_Send_Bit0()
 {
  AVC_SET_1();
- delay1(32);							// 28-37
+ _delay_us(32);							// 28-37
 	
  AVC_SET_0();
- delay1(4);								// 00-09
+ _delay_us(4);								// 00-09
 }
 //------------------------------------------------------------------------------
 u08 AVCLan_Read_ACK()
@@ -259,10 +259,10 @@ u08 AVCLan_Read_ACK()
  u08 time = 0;
 
  AVC_SET_1();
- delay1(19);
+ _delay_us(19);
 
  AVC_SET_0();
- delay1(1);
+ _delay_us(1);
 
 
  AVC_OUT_DIS(); // switch to read mode
@@ -291,10 +291,10 @@ u08 AVCLan_Send_ACK()
  AVC_OUT_EN();
 
  AVC_SET_1();
- delay1(32);								//28-37
+ _delay_us(32);								//28-37
 
  AVC_SET_0();
- delay1(4);									//00-09
+ _delay_us(4);									//00-09
 
  AVC_OUT_DIS();
 

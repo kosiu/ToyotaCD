@@ -29,9 +29,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+#include <util/delay.h>
 #include "const.h"
 #include "com232.h"
-#include "delay2.h"
 #include "avclandrv.h"
 
 
@@ -76,9 +76,14 @@ int main()
  RS232_S((u16)PSTR("L/l - log on/off\n"));
  RS232_S((u16)PSTR("K/k - seq. echo on/off\n"));
  RS232_S((u16)PSTR("R/r - register device\n"));
-
-  
  
+ 
+ //new Register device
+ //delay_ms(100);
+ //AVCLan_Register();
+ //AVCLan_Command( cmRegister );
+ //AVCLan_Register();
+
  while (1) {
 
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
@@ -119,6 +124,10 @@ int main()
 						  readSeq=0;
 						} else {
 						  showLog = 0;
+						  RS232_Print("DEV ID SET: 0x");
+						  RS232_PrintHex8(CD_ID_1);
+						  RS232_PrintHex8(CD_ID_2);
+						  RS232_Print("\n");
 						  RS232_Print("DEV ID > \n");
 						  readSeq = 1;
 						  s_len=0;
@@ -138,6 +147,10 @@ int main()
 						  readSeq=0;
 						} else {
 						  showLog = 0;
+						  RS232_Print("HU ID SET: 0x");
+						  RS232_PrintHex8(HU_ID_1);
+						  RS232_PrintHex8(HU_ID_2);
+						  RS232_Print("\n");
 						  RS232_Print("HU ID > \n");
 						  readSeq = 1;
 						  s_len=0;
@@ -165,7 +178,7 @@ int main()
 
 			case 'R':	RS232_Print("REGIST:\n");
 						AVCLan_Command( cmRegister );
- 						delay1(15);
+ 						_delay_us(15);
  						CHECK_AVC_LINE;
 						break;
 			case 'r':	AVCLan_Register();
@@ -231,13 +244,13 @@ void Setup()
 {
 // GIMSK = 0;			// (GICR ?) disable external interupts
 
- CD_ID_1 = 0x02;
- CD_ID_2 = 0x80;
+ CD_ID_1 = 0x03;
+ CD_ID_2 = 0x60; //was cammera
 
  HU_ID_1 = 0x01;
- HU_ID_2 = 0x40;
+ HU_ID_2 = 0x60; //was 0x40
 
- showLog = 1;
+ showLog = 0;
  showLog2 = 1;
 
  MCUCR = 0;
