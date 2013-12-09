@@ -28,7 +28,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "com232.h"
-#include "const.h"
+
 
 
 #ifndef F_CPU

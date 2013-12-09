@@ -101,12 +101,12 @@ int main()
 
 	// Key handler
 	if (RS232_RxCharEnd) {
-		cbi(UCSRB,RXCIE);								// disable RX complete interrupt
+		cbi(UCSR0B, RXCIE0);								// disable RX complete interrupt
 		readkey = RS232_RxCharBuffer[RS232_RxCharBegin];// read begin of received Buffer
 		RS232_RxCharBegin++;
 		if (RS232_RxCharBegin == RS232_RxCharEnd)		// if Buffer is empty
 			RS232_RxCharBegin = RS232_RxCharEnd = 0;	// do reset Buffer
-		sbi(UCSRB, RXCIE);								// enable RX complete interrupt
+		sbi(UCSR0B, RXCIE0);								// enable RX complete interrupt
 		switch (readkey) {
 			case 'T':	if (readSeq) {
 						  CD_ID_1 = data_tmp[0];
@@ -241,8 +241,8 @@ void Setup()
  showLog2 = 1;
 
  MCUCR = 0;
- TIMSK = 0;
- sbi(TIMSK, TOIE1); // Enable timer1 interrupt
+ TIMSK1 = 0;
+ sbi(TIMSK1, TOIE1); // Enable timer1 interrupt
 
 
  // Timer 1

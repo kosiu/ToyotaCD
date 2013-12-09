@@ -28,21 +28,33 @@
 #define __CONST_H
 //------------------------------------------------------------------------------
 
+//(0 1 2) - I don't know
 #define TIMSK1 TIMSK
-#define UCSR0B UCSRB
-#define RXCIE0 RXCIE
+//same
 #define TCCR0B TCCR0
+//should be SFIOR
 #define ADCSRB ADCSR
-
-#define UCSR0A UCSRA
+//same
+#define RXCIE0 RXCIE
+//same
 #define RXEN0 RXEN
+//same
 #define TXEN0 TXEN
-#define UCSR0C UCSRC
-#define UCSZ01 UCSZ1
+//same
 #define UCSZ00 UCSZ0
-#define UBRR0 UBRR
+//same
+#define UCSZ01 UCSZ1
+//same
 #define UCSR0A UCSRA
+//same
+#define UCSR0B UCSRB
+//different
+#define UCSR0C UCSRC
+//same
 #define UDRE0 UDRE
+//i don't know
+#define UBRR0 UBRR
+//same
 #define UDR0 UDR
 
 
