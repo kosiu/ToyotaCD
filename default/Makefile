@@ -6,7 +6,7 @@
 PROJECT = sniffer
 MCU = atmega88
 TARGET = sniffer.elf
-CC = avr-gcc.exe
+CC = avr-gcc
 
 ## Options common to compile, link and assembly rules
 COMMON = -mmcu=$(MCU)
