@@ -29,6 +29,7 @@
 #define _AVR_TIMER_H_
 
 #include <avr/io.h>
+#include "const.h"
 
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega64__)
 # warning "This file is known to be incorrect for your MCU type"

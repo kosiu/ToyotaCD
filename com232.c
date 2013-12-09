@@ -28,7 +28,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "com232.h"
-
+#include "const.h"
 
 
 #ifndef F_CPU
@@ -55,7 +55,8 @@ void RS232_Init(void)
  UCSR0A = 0;
  UCSR0B = ((1<<RXCIE0) | (1<<RXEN0) | (1<<TXEN0));	// enable RxD/TxD and interrupts
  UCSR0C = ((1<<UCSZ01)|(1<<UCSZ00));				// 8N1
- UBRR0  = 7;
+ UBRRL  = 7;
+ UBRRH  = 0;
 
 }
 //------------------------------------------------------------------------------

@@ -28,6 +28,23 @@
 #define __CONST_H
 //------------------------------------------------------------------------------
 
+#define TIMSK1 TIMSK
+#define UCSR0B UCSRB
+#define RXCIE0 RXCIE
+#define TCCR0B TCCR0
+#define ADCSRB ADCSR
+
+#define UCSR0A UCSRA
+#define RXEN0 RXEN
+#define TXEN0 TXEN
+#define UCSR0C UCSRC
+#define UCSZ01 UCSZ1
+#define UCSZ00 UCSZ0
+#define UBRR0 UBRR
+#define UCSR0A UCSRA
+#define UDRE0 UDRE
+#define UDR0 UDR
+
 
 
 //------------------------------------------------------------------------------
