@@ -21,10 +21,8 @@
  		http://www.softservice.com.pl/corolla/avc
 
  May 28 / 2009	- version 2
-
+ December 09 / 2013 - by Jacek Kosek
 */
-
-
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -38,13 +36,8 @@
 // -------------------------------------------------------------------------------------
 void Setup();
 
-u08 rcv_command[5];
-u08 rcv_pos = 0;
-u08 rcv_time_clr = 0;
 
-// -------------------------------------------------------------------------------------
-
-
+u08 Event;
 
 
 // -------------------------------------------------------------------------------------
@@ -52,10 +45,8 @@ u08 rcv_time_clr = 0;
 //
 int main()
 {
-// u08 h;
 
-
- u08 readSeq = 0;
+ u08 readSeq 	= 0;
  u08 s_len	= 0;
  u08 s_dig	= 0;
  u08 s_c[2];
@@ -63,8 +54,6 @@ int main()
  u08 data_tmp[32];
 
  Setup();
-
-
  
  RS232_S((u16)PSTR("AVCLan reader 1.00\nReady\n\n"));
  LED_OFF();
@@ -77,13 +66,6 @@ int main()
  RS232_S((u16)PSTR("K/k - seq. echo on/off\n"));
  RS232_S((u16)PSTR("R/r - register device\n"));
  
- 
- //new Register device
- //delay_ms(100);
- //AVCLan_Register();
- //AVCLan_Command( cmRegister );
- //AVCLan_Register();
-
  while (1) {
 
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
@@ -106,12 +88,12 @@ int main()
 
 	// Key handler
 	if (RS232_RxCharEnd) {
-		cbi(UCSR0B, RXCIE0);								// disable RX complete interrupt
+		cbi(UCSR0B, RXCIE0);				// disable RX complete interrupt
 		readkey = RS232_RxCharBuffer[RS232_RxCharBegin];// read begin of received Buffer
 		RS232_RxCharBegin++;
-		if (RS232_RxCharBegin == RS232_RxCharEnd)		// if Buffer is empty
-			RS232_RxCharBegin = RS232_RxCharEnd = 0;	// do reset Buffer
-		sbi(UCSR0B, RXCIE0);								// enable RX complete interrupt
+		if (RS232_RxCharBegin == RS232_RxCharEnd)	// if Buffer is empty
+			RS232_RxCharBegin = RS232_RxCharEnd = 0;// do reset Buffer
+		sbi(UCSR0B, RXCIE0);				// enable RX complete interrupt
 		switch (readkey) {
 			case 'T':	if (readSeq) {
 						  CD_ID_1 = data_tmp[0];
@@ -228,9 +210,6 @@ int main()
 
 	}// if (RS232_RxCharEnd)
 
-
-
-
  }
  return 0;
 }
@@ -250,7 +229,7 @@ void Setup()
  HU_ID_1 = 0x01;
  HU_ID_2 = 0x60; //was 0x40
 
- showLog = 0;
+ showLog = 1;
  showLog2 = 1;
 
  MCUCR = 0;

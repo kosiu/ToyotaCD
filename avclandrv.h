@@ -47,16 +47,12 @@ void AVC_ReleaseLine();
 #define MAXMSGLEN	32
 
 // Head Unid ID
-extern u08 HU_ID_1;		//	0x01
-extern u08 HU_ID_2;		//	0x40
+extern u08 HU_ID_1;		// 0x01
+extern u08 HU_ID_2;		// 0x40
 
 extern u08 CD_ID_1;		// 0x03
 extern u08 CD_ID_2;		// 0x60
 
-
-// DVD CHANGER
-//#define CD_ID_1	0x02
-//#define CD_ID_2	0x50
 
 #define cmNull		0
 #define cmStatus1	1
@@ -109,7 +105,7 @@ void AVCLan_Register();
 u08  AVCLan_SendData();
 u08  AVCLan_SendAnswer();
 u08  AVCLan_SendDataBroadcast();
-u08	 AVCLan_Command(u08 command);
+u08  AVCLan_Command(u08 command);
 
 u08  HexInc(u08 data);
 u08  HexDec(u08 data);

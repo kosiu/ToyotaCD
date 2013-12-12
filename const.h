@@ -45,12 +45,7 @@
 
 //------------------------------------------------------------------------------
 
-
-// max 10 events in fifo
-extern u08 EventCount;
-extern u08 EventCmd[10];
-extern u08 Event;
-
+// Event types
 #define EV_NOTHING	0
 #define EV_DISPLAY	1
 #define EV_STATUS	4
@@ -64,12 +59,6 @@ extern u08 Event;
 #define smHour		4
 #define smMin		5
 #define smWDay		6
-
-
-
-//#define STOPEvent  cbi(TIMSK, TOIE1); cbi(UCSRB, RXCIE);
-//#define STARTEvent sbi(TIMSK, TOIE1); sbi(UCSRB, RXCIE);
-
 
 extern u08 showLog;
 extern u08 showLog2;

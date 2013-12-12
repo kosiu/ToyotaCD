@@ -76,7 +76,7 @@ const u08 stat4[] 		= { 0x4,	0x00, 0x00, 0x01, 0x0C };
 
 // broadcast
 const u08 lan_stat1[]	= { 0x3,	0x00, 0x01, 0x0A };
-const u08 lan_reg[]		= { 0x3,	SW_ID, 0x01, 0x00 };
+const u08 lan_reg[]	= { 0x3,	SW_ID, 0x01, 0x00 };
 const u08 lan_init[]	= { 0x3,	SW_ID, 0x01, 0x01 };
 const u08 lan_check[]	= { 0x3,	SW_ID, 0x01, 0x20 };
 const u08 lan_playit[]	= { 0x4,	SW_ID, 0x01, 0x45, 0x63 };
@@ -102,7 +102,7 @@ const u08	CMD_STATUS1[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x1A };
 const u08	CMD_STATUS2[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x18 };
 const u08	CMD_STATUS3[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x1D };
 const u08	CMD_STATUS4[]	= {0x1,		0x05,	0x00, 0x01, 0x00, 0x1C, 0x00 };
-u08			CMD_CHECK[]		= {0x1,		0x06,	0x00, 0x01, SW_ID, 0x30, 0x00, 0x00 };
+u08		CMD_CHECK[]	= {0x1,		0x06,	0x00, 0x01, SW_ID, 0x30, 0x00, 0x00 };
 
 const u08	CMD_STATUS5[]	= {0x1,		0x05,	0x00, 0x5C, 0x12, 0x53, 0x02 };
 const u08	CMD_STATUS5A[]	= {0x0,		0x05,	0x5C, 0x31, 0xF1, 0x00, 0x00 };
@@ -113,12 +113,12 @@ const u08	CMD_STATUS6[]	= {0x1,		0x06,	0x00, 0x5C, 0x32, 0xF0, 0x02, 0x00 };
 const u08	CMD_PLAY_OK1[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x50, 0x01 };
 const u08	CMD_PLAY_OK2[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x52, 0x01 };
 const u08	CMD_PLAY_OK3[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x01, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
-u08			CMD_PLAY_OK4[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 };
+u08		CMD_PLAY_OK4[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 };
 
-const u08	CMD_STOP1[]		= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x53, 0x01 };
-u08			CMD_STOP2[]		= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x00, 0x30, 0x00, 0x00,0x00, 0x00, 0x00, 0x80 };
+const u08	CMD_STOP1[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x53, 0x01 };
+u08		CMD_STOP2[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x00, 0x30, 0x00, 0x00,0x00, 0x00, 0x00, 0x80 };
 
-const u08	CMD_BEEP[]		= {0x1,		0x05,	0x00, 0x63, 0x29, 0x60, 0x02 };
+const u08	CMD_BEEP[]	= {0x1,		0x05,	0x00, 0x63, 0x29, 0x60, 0x02 };
 
 //------------------------------------------------------------------------------
 
@@ -176,17 +176,10 @@ void AVCLan_Init()
  // Analog comparator
  
  cbi(ADCSRB, ACME);	// Analog Comparator Multiplexer Enable - NO
-/*
- cbi(ACSR, ACBG);	// Analog Comparator Bandgap Select
- 					// ACI: Analog Comparator Interrupt Flag
-
- cbi(ACSR, ACIE);	// Analog Comparator Interrupt Enable - NO
- cbi(ACSR, ACIC);	// Analog Comparator Input Capture Enable - NO
-*/
  cbi(ACSR, ACIS1);	// Analog Comparator Interrupt Mode Select
- cbi(ACSR, ACIS0);  // Comparator Interrupt on Output Toggle
+ cbi(ACSR, ACIS0);	// Comparator Interrupt on Output Toggle
 
- cbi(ACSR, ACD); 	// Analog Comparator Disbale - NO
+ cbi(ACSR, ACD);	// Analog Comparator Disbale - NO
 
 
  message_len   = 0;
@@ -461,7 +454,6 @@ u08 AVCLan_Read_Message()
 	if (CheckCmd((u08*)stat2)) { answerReq = cmStatus2; return 1; }
 	if (CheckCmd((u08*)stat3)) { answerReq = cmStatus3; return 1; }
 	if (CheckCmd((u08*)stat4)) { answerReq = cmStatus4; return 1; }
-//	if (CheckCmd((u08*)stat5)) { answerReq = cmStatus5; return 1; }
 
 	if (CheckCmd((u08*)play_req1)) { answerReq = cmPlayReq1; return 1; }
 	if (CheckCmd((u08*)play_req2)) { answerReq = cmPlayReq2; return 1; }
@@ -512,7 +504,7 @@ u08 AVCLan_SendData()
  AVC_OUT_EN();
 
  AVCLan_Send_StartBit();
- AVCLan_Send_Byte(0x1,  1);		// regular communication
+ AVCLan_Send_Byte(0x1,  1);	// regular communication
 
 
  parity_bit = 0;
@@ -533,7 +525,7 @@ u08 AVCLan_SendData()
  }
 
 
- AVCLan_Send_Byte(0xF, 4);		// 0xf - control -> COMMAND WRITE
+ AVCLan_Send_Byte(0xF, 4);	// 0xf - control -> COMMAND WRITE
  AVCLan_Send_ParityBit();
  if (AVCLan_Read_ACK()) {
  	 AVC_OUT_DIS();
@@ -599,7 +591,7 @@ u08 AVCLan_SendDataBroadcast()
  AVCLan_Send_Byte(0x0,  1);		// broadcast
 
  parity_bit = 0;
- AVCLan_Send_Byte(CD_ID_1, 4);	// CD Changer ID as master
+ AVCLan_Send_Byte(CD_ID_1, 4);		// CD Changer ID as master
  AVCLan_Send_Byte(CD_ID_2, 8);
  AVCLan_Send_ParityBit();
 
@@ -617,7 +609,7 @@ u08 AVCLan_SendDataBroadcast()
  AVCLan_Send_Bit1();
 
  for (i=0;i<data_len;i++) {
-	AVCLan_Send_Byte(data[i], 8); // data byte
+	AVCLan_Send_Byte(data[i], 8); 	// data byte
  	AVCLan_Send_ParityBit();
 	AVCLan_Send_Bit1();
  }
@@ -705,8 +697,6 @@ u08 AVCLan_SendInitCommands()
  if (!r) r = AVCLan_SendAnswerFrame((u08*)c9);
  if (!r) r = AVCLan_SendAnswerFrame((u08*)cA);
 
- //const u08 c1[] = { 0x0, 0x0B,		0x63, 0x31, 0xF1, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
- //r = AVCLan_SendAnswerFrame((u08*)c1);
  return r;
 }
 //------------------------------------------------------------------------------
@@ -742,7 +732,7 @@ u08 AVCLan_SendAnswer()
 						break;
  	case cmRegister:	r = AVCLan_SendAnswerFrame((u08*)CMD_REGISTER); 
 						break;
- 	case cmInit:		//RS232_Print("INIT\n");
+ 	case cmInit:
 						r = AVCLan_SendInitCommands(); 
 						break;
  	case cmCheck:		r = AVCLan_SendAnswerFrame((u08*)CMD_CHECK); 

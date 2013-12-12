@@ -26,12 +26,6 @@
 
 #include "const.h"
 //------------------------------------------------------------------------------
-
-
-// max 10 events in fifo
-u08 EventCount;
-u08 EventCmd[10];
-u08 Event;
-
 u08 showLog;
 u08 showLog2;
+
