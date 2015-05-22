@@ -221,10 +221,12 @@ u08 AVCLan_Read_Byte(u08 length)
 u08 AVCLan_Send_StartBit()
 {
  AVC_SET_1();
+ //measured about 166us target is 166
  _delay_us(166);
  
  AVC_SET_0();
- _delay_us(30);
+ //with value 30 measured 35us decreased to 25 target is 30
+ _delay_us(25);
 
  return 1;
 }
@@ -232,19 +234,23 @@ u08 AVCLan_Send_StartBit()
 void AVCLan_Send_Bit1()
 {
  AVC_SET_1();
+ //measured about 20us target is 20
  _delay_us(20);
 
  AVC_SET_0();
+ //measured about 21us target is 20
  _delay_us(16);							// 12-21
 }
 //------------------------------------------------------------------------------
 void AVCLan_Send_Bit0()
 {
  AVC_SET_1();
+ //measured about 32us target is 32
  _delay_us(32);							// 28-37
 	
  AVC_SET_0();
- _delay_us(4);								// 00-09
+ //with value 4 measured 5.3us increase to 5 target is 7
+ _delay_us(5);								// 00-09
 }
 //------------------------------------------------------------------------------
 u08 AVCLan_Read_ACK()
@@ -284,10 +290,11 @@ u08 AVCLan_Send_ACK()
  AVC_OUT_EN();
 
  AVC_SET_1();
+ //like sending "0"
  _delay_us(32);								//28-37
 
  AVC_SET_0();
- _delay_us(4);									//00-09
+ _delay_us(5);									//00-09
 
  AVC_OUT_DIS();
 

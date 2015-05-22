@@ -32,7 +32,6 @@
 #include "com232.h"
 #include "avclandrv.h"
 
-
 // -------------------------------------------------------------------------------------
 void Setup();
 
@@ -259,7 +258,7 @@ void Setup()
 
 u08 s1=0;
 //------------------------------------------------------------------------------
-SIGNAL(SIG_OVERFLOW1)					// Timer1 overflow every 1Sec
+ISR(INT1_vect)					// Timer1 overflow every 1Sec
 {
 	TCNT1  = 0xFFFF - 0x7080;
 

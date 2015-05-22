@@ -59,7 +59,7 @@ void RS232_Init(void)
 
 }
 //------------------------------------------------------------------------------
-SIGNAL(SIG_USART_RECV)      
+ISR(USART_RXC_vect)      
 {
 	RS232_RxCharBuffer[RS232_RxCharEnd] = UDR0;		// Store received character to the End of Buffer
     RS232_RxCharEnd++;
