@@ -4,7 +4,7 @@
 
 ## General Flags
 PROJECT = sniffer
-MCU = atmega88p
+MCU = atmega88
 TARGET = sniffer.elf
 CC = avr-gcc
 
