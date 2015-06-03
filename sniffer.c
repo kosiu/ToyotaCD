@@ -32,7 +32,6 @@
 #include "com232.h"
 #include "avclandrv.h"
 
-
 // -------------------------------------------------------------------------------------
 void Setup();
 
@@ -69,14 +68,14 @@ int main()
  while (1) {
 
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
-		LED_ON();
+		//LED_ON();
   		AVCLan_Read_Message();
 		// show message
 	} else {
-		LED_OFF();
+		//LED_OFF();
 		// check command from HU
 		if (answerReq != 0) AVCLan_SendAnswer();
-    }
+	}
 
 	// HandleEvent
 	switch (Event) {
@@ -221,7 +220,6 @@ int main()
 //
 void Setup()
 {
-// GIMSK = 0;			// (GICR ?) disable external interupts
 
  CD_ID_1 = 0x03;
  CD_ID_2 = 0x60; //was cammera
@@ -232,26 +230,20 @@ void Setup()
  showLog = 1;
  showLog2 = 1;
 
- MCUCR = 0;
- TIMSK1 = 0;
- sbi(TIMSK1, TOIE1); // Enable timer1 interrupt
-
-
- // Timer 1
- TCCR1A = 0;
- TCCR1B = _BV(CS12);
- TCNT1  = 0xFFFF - 0x7080;
+ MCUCR = 0; //turn on everything
  
+ //Clear Timer on Compare Mode
+ TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode 
+ TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
 
-
+ 
  RS232_Init();
-
- 
  AVCLan_Init();
 
  Event = EV_NOTHING;
- sei();
+ sei(); //enable global interupts
 
+ OCR1A   = 0xFFFF - 0x7080; // Set CTC compare value
 
 }
 // -------------------------------------------------------------------------------------
@@ -259,12 +251,13 @@ void Setup()
 
 u08 s1=0;
 //------------------------------------------------------------------------------
-SIGNAL(SIG_OVERFLOW1)					// Timer1 overflow every 1Sec
+ISR(TIMER1_COMPA_vect)					// Timer1 overflow every 1Sec
 {
-	TCNT1  = 0xFFFF - 0x7080;
+	//TCNT1  = 0xFFFF - 0x7080;
 
 	s1++;
 	if (s1==2) {
+		LED_ON();
 		s1=0;
 		if (CD_Mode==stPlay) {
 			cd_Time_Sec=HexInc(cd_Time_Sec);
@@ -277,6 +270,8 @@ SIGNAL(SIG_OVERFLOW1)					// Timer1 overflow every 1Sec
 			}
 			Event |= EV_STATUS;
 		}
+	}else{
+	  LED_OFF();
 	}
 
 

@@ -1,0 +1,13 @@
+CD Changer emulator AUX Enabler
+
+This project is based on sniffer2 by Sloniu
+
+
+v0.1 - works only partially (after sometime CD changer dissapear)
+	R - short register
+	r - long register
+Fuses:
+EX: 0xF9
+HI: 0xDC
+LO: 0xFF
+
