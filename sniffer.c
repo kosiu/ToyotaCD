@@ -68,11 +68,11 @@ int main()
  while (1) {
 
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
-		LED_ON();
+		//LED_ON();
   		AVCLan_Read_Message();
 		// show message
 	} else {
-		LED_OFF();
+		//LED_OFF();
 		// check command from HU
 		if (answerReq != 0) AVCLan_SendAnswer();
 	}
@@ -230,8 +230,10 @@ void Setup()
  showLog = 1;
  showLog2 = 1;
 
+ MCUCR = 0; //turn on everything
+ 
  //Clear Timer on Compare Mode
- TCCR1B |= (1 << WGM12 | 1 << CS10); // Configure timer 1 for CTC mode 
+ TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode 
  TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
 
  
@@ -255,6 +257,7 @@ ISR(TIMER1_COMPA_vect)					// Timer1 overflow every 1Sec
 
 	s1++;
 	if (s1==2) {
+		LED_ON();
 		s1=0;
 		if (CD_Mode==stPlay) {
 			cd_Time_Sec=HexInc(cd_Time_Sec);
@@ -267,6 +270,8 @@ ISR(TIMER1_COMPA_vect)					// Timer1 overflow every 1Sec
 			}
 			Event |= EV_STATUS;
 		}
+	}else{
+	  LED_OFF();
 	}
 
 
