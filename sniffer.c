@@ -233,7 +233,7 @@ void Setup()
  MCUCR = 0; //turn on everything
  
  //Clear Timer on Compare Mode
- TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode 
+ TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode with 256 prescaler
  TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
 
  
@@ -243,7 +243,8 @@ void Setup()
  Event = EV_NOTHING;
  sei(); //enable global interupts
 
- OCR1A   = 0xFFFF - 0x7080; // Set CTC compare value
+ //         T  * osc. freq. / prescaler - 1 (error: 1s per 50h)
+ OCR1A   = 0.5 *   14745000 /       256 - 1; // Set CTC compare value
 
 }
 // -------------------------------------------------------------------------------------
@@ -251,9 +252,8 @@ void Setup()
 
 u08 s1=0;
 //------------------------------------------------------------------------------
-ISR(TIMER1_COMPA_vect)					// Timer1 overflow every 1Sec
+ISR(TIMER1_COMPA_vect)			// Timer1 overflow every .5Sec
 {
-	//TCNT1  = 0xFFFF - 0x7080;
 
 	s1++;
 	if (s1==2) {

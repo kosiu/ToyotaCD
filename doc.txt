@@ -2,12 +2,23 @@ CD Changer emulator AUX Enabler
 
 This project is based on sniffer2 by Sloniu
 
+v0.2 - Small fixes for the new compiler removing obsolate instructions
 
 v0.1 - works only partially (after sometime CD changer dissapear)
 	R - short register
 	r - long register
+
 Fuses:
 EX: 0xF9
 HI: 0xDC
 LO: 0xFF
 
+TODO:
+1. Hardware usb power connection
+2. Hardware audio connection
+3. Log buttons from Corolla
+4. Setting BT button play - hardware/software
+5. Connection BT - hardware/software (power on/off? reset? other buttons?)
+6. Microphone: hardware-add cables / software - remove it
+
+7.
