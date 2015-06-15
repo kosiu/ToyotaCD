@@ -37,13 +37,13 @@ u08 readkey;
 //------------------------------------------------------------------------------
 
 void RS232_Init(void);
-extern void RS232_S(u16 str_addr);
-extern void RS232_SendByte(u08 Data);
-extern void RS232_Print(char* pBuf);
-extern void RS232_PrintHex4(u08 Data);
-extern void RS232_PrintHex8(u08 Data);
-extern void RS232_PrintDec(u08 Data);
-extern void RS232_PrintDec2(u08 Data);
+void RS232_S(u16 str_addr);
+void RS232_SendByte(u08 Data);
+void RS232_Print(char* pBuf);
+void RS232_PrintHex4(u08 Data);
+void RS232_PrintHex8(u08 Data);
+void RS232_PrintDec(u08 Data);
+void RS232_PrintDec2(u08 Data);
 
 //------------------------------------------------------------------------------
 // LED

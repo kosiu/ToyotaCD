@@ -32,6 +32,7 @@
 #include "avclandrv.h"
 #include "com232.h"
 #include "const.h"
+#include "logger.h"
 
 
 //------------------------------------------------------------------------------
@@ -453,7 +454,7 @@ u08 AVCLan_Read_Message()
 
  STARTEvent;
 
- if (showLog) ShowInMessage();
+ if (logLevel>0) ShowInMessage();
 
  if (for_me) {
  	
@@ -567,7 +568,7 @@ u08 AVCLan_SendData()
  AVC_OUT_DIS();
 
  STARTEvent;
- if (showLog) ShowOutMessage();
+ if (logLevel>0) ShowOutMessage();
  return 0;
 }
 //------------------------------------------------------------------------------
@@ -623,7 +624,7 @@ u08 AVCLan_SendDataBroadcast()
 
  AVC_OUT_DIS();
  STARTEvent;
- if (showLog) ShowOutMessage();
+ if (logLevel>0) ShowOutMessage();
  return 0;
 }
 //------------------------------------------------------------------------------

@@ -20,8 +20,9 @@
  -----------------------------------------------------------------------
  		http://www.softservice.com.pl/corolla/avc
 
- May 28 / 2009	- version 2
-
+ May 28 / 2009	- version 2 by Marcin Slonicki
+          2015  - version 3 by Jacek Kosek
+ 
 */
 
 #ifndef __CONST_H
@@ -49,18 +50,6 @@
 #define EV_DISPLAY	1
 #define EV_STATUS	4
 
-//------------------------------------------------------------------------------
-
-// const
-#define smYear		1
-#define smMonth		2
-#define smDay		3
-#define smHour		4
-#define smMin		5
-#define smWDay		6
-
-extern u08 showLog;
-extern u08 showLog2;
 
 //------------------------------------------------------------------------------
 #endif

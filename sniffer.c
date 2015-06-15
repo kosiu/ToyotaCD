@@ -22,6 +22,7 @@
 
  May 28 / 2009	- version 2
  December 09 / 2013 - by Jacek Kosek
+ 2015 - by Jacek Kosek
 */
 
 #include <avr/io.h>
@@ -31,11 +32,13 @@
 #include "const.h"
 #include "com232.h"
 #include "avclandrv.h"
+#include "logger.h"
 
-// -------------------------------------------------------------------------------------
+// declaratins-----------------------------------------------------------------------
+
 void Setup();
 
-
+// Hold event Ty
 u08 Event;
 
 
@@ -66,22 +69,23 @@ int main()
  RS232_S((u16)PSTR("R/r - register device\n"));
  
  while (1) {
-
+   
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
-		//LED_ON();
+		LED_ON();
   		AVCLan_Read_Message();
 		// show message
 	} else {
-		//LED_OFF();
+		LED_OFF();
 		// check command from HU
 		if (answerReq != 0) AVCLan_SendAnswer();
 	}
 
 	// HandleEvent
 	switch (Event) {
-	  case EV_STATUS:	Event &= ~EV_STATUS;
-						AVCLan_Send_Status();
-						break;
+	  case EV_STATUS: //recievd from timer interupt to send status
+		Event &= ~EV_STATUS; //clear event
+		AVCLan_Send_Status();
+		break;
 	}
 
 
@@ -101,10 +105,10 @@ int main()
 						  RS232_PrintHex8(CD_ID_1);
 						  RS232_PrintHex8(CD_ID_2);
 						  RS232_Print("\n");
-						  showLog = 1;	
+						  logLevel = 1;	
 						  readSeq=0;
 						} else {
-						  showLog = 0;
+						  logLevel = 0;
 						  RS232_Print("DEV ID SET: 0x");
 						  RS232_PrintHex8(CD_ID_1);
 						  RS232_PrintHex8(CD_ID_2);
@@ -124,10 +128,10 @@ int main()
 						  RS232_PrintHex8(HU_ID_1);
 						  RS232_PrintHex8(HU_ID_2);
 						  RS232_Print("\n");
-						  showLog = 1;	
+						  logLevel = 1;	
 						  readSeq=0;
 						} else {
-						  showLog = 0;
+						  logLevel = 0;
 						  RS232_Print("HU ID SET: 0x");
 						  RS232_PrintHex8(HU_ID_1);
 						  RS232_PrintHex8(HU_ID_2);
@@ -140,18 +144,18 @@ int main()
 						}
 						break;
 
-			case 'S':	showLog = 0;
+			case 'S':	logLevel = 0;
 						RS232_Print("READ SEQUENCE > \n");
 						readSeq = 1;
 						s_len=0;
 						s_dig=0;
 						s_c[0]=s_c[1]=0;
 						break;
-			case 'W' :  showLog = 1;
+			case 'W' :  logLevel = 1;
 						readSeq=0;
 						AVCLan_SendMyData(data_tmp, s_len);
 						break;
-			case 'Q' :  showLog = 1;
+			case 'Q' :  logLevel = 1;
 						readSeq=0;
 						AVCLan_SendMyDataBroadcast(data_tmp, s_len);
 						break;
@@ -159,25 +163,25 @@ int main()
 
 			case 'R':	RS232_Print("REGIST:\n");
 						AVCLan_Command( cmRegister );
- 						_delay_us(15);
- 						CHECK_AVC_LINE;
+						_delay_us(15);
+						CHECK_AVC_LINE;
 						break;
 			case 'r':	AVCLan_Register();
 						break;
 
 
 			case 'l':	RS232_Print("Log OFF\n");
-						showLog = 0;
+						logLevel = 0;
 						break;
 			case 'L':	RS232_Print("Log ON\n");
-						showLog = 1;
+						logLevel = 1;
 						break;
 
 			case 'k':	RS232_Print("str OFF\n");
-						showLog2 = 0;
+						echo = 0;
 						break;
 			case 'K':	RS232_Print("str ON\n");
-						showLog2 = 1;
+						echo = 1;
 						break;
 
 			default :
@@ -196,7 +200,7 @@ int main()
 						s_dig=0;
 						s_c[0]=s_c[1]=0;
 					}
-					if (showLog2) {
+					if (echo) {
 						RS232_Print("CURREENT SEQUENCE > ");
 						for (i=0; i<s_len; i++) {
 								RS232_PrintHex8(data_tmp[i]);
@@ -227,8 +231,8 @@ void Setup()
  HU_ID_1 = 0x01;
  HU_ID_2 = 0x60; //was 0x40
 
- showLog = 1;
- showLog2 = 1;
+ logLevel = 1;
+ echo = 1;
 
  MCUCR = 0; //turn on everything
  
@@ -257,21 +261,20 @@ ISR(TIMER1_COMPA_vect)			// Timer1 overflow every .5Sec
 
 	s1++;
 	if (s1==2) {
-		LED_ON();
 		s1=0;
-		if (CD_Mode==stPlay) {
-			cd_Time_Sec=HexInc(cd_Time_Sec);
-			if (cd_Time_Sec==0x60) {
-				cd_Time_Sec = 0;
-				cd_Time_Min=HexInc(cd_Time_Min);
-				if (cd_Time_Min==0xA0) {
-					cd_Time_Min=0x0;
-				}
+		
+		cd_Time_Sec=HexInc(cd_Time_Sec);
+		if (cd_Time_Sec==0x60) {
+			cd_Time_Sec = 0;
+			cd_Time_Min=HexInc(cd_Time_Min);
+			if (cd_Time_Min==0xA0) {
+				cd_Time_Min=0x0;
 			}
+		}
+		if (CD_Mode==stPlay) {
+			// set event to send status in main loop
 			Event |= EV_STATUS;
 		}
-	}else{
-	  LED_OFF();
 	}
 
 
