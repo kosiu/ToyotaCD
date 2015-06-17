@@ -51,9 +51,6 @@
 // Private timers interupt on off to be checked
 #define STARTEvent sbi(TIMSK1, TOIE1); sbi(UCSR0B, RXCIE0);
 
-// Not used might be useful
-#define CHECK_AVC_LINE	if (INPUT_IS_SET) AVCLan_Read_Message();
-
 
 //------------------------------------------------------------------------------
 // Global varibles Definitions

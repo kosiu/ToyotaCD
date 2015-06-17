@@ -35,6 +35,11 @@
 // true if message from some device on AVCLan begin
 #define INPUT_IS_SET (ACSR & _BV(ACO))
 
+// Check and read Message                                                                                                                  
+#define CHECK_AVC_LINE  if (INPUT_IS_SET) AVCLan_Read_Message();                                                                             
+
+
+
 #define MAXMSGLEN	32
 
 // Commands:
