@@ -30,14 +30,6 @@
 
 #include <avr/io.h>
 
-#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega64__)
-# warning "This file is known to be incorrect for your MCU type"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum {
   STOP             = 0,
   CK               = 1,
@@ -54,21 +46,9 @@ static __inline__ void timer0_source (unsigned int src)
     TCCR0B = src;
 }
 
-/*
- * NB: this is completely bogus.
- */
-static __inline__ void timer0_stop (void)
-{
-    TCNT0 = 0;
-}
-
 static __inline__ void timer0_start (void)
 {
     TCNT0 = 1;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _AVR_TIMER_H_ */

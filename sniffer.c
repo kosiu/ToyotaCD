@@ -24,7 +24,7 @@
  December 09 / 2013 - by Jacek Kosek
  2015 - by Jacek Kosek
 */
-
+#include <inttypes.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -38,8 +38,8 @@
 
 void Setup();
 
-// Hold event Ty
-u08 Event;
+// Hold event Type
+uint8_t Event;
 
 
 // -------------------------------------------------------------------------------------
@@ -48,32 +48,31 @@ u08 Event;
 int main()
 {
 
- u08 readSeq 	= 0;
- u08 s_len	= 0;
- u08 s_dig	= 0;
- u08 s_c[2];
- u08 i;
- u08 data_tmp[32];
+ uint8_t readSeq = 0;
+ uint8_t s_len	= 0;
+ uint8_t s_dig	= 0;
+ uint8_t s_c[2];
+ uint8_t i;
+ uint8_t data_tmp[32];
 
  Setup();
  
- RS232_S((u16)PSTR("AVCLan reader 1.00\nReady\n\n"));
+ RS232_S((uintptr_t)PSTR("AVCLan reader 1.00\nReady\n\n"));
  LED_OFF();
- RS232_S((u16)PSTR("T - device id\n"));
- RS232_S((u16)PSTR("H - HU id\n"));
- RS232_S((u16)PSTR("S - read sequence\n"));
- RS232_S((u16)PSTR("W - send command\n"));
- RS232_S((u16)PSTR("Q - send broadcast\n"));
- RS232_S((u16)PSTR("L/l - log on/off\n"));
- RS232_S((u16)PSTR("K/k - seq. echo on/off\n"));
- RS232_S((u16)PSTR("R/r - register device\n"));
+ RS232_S((uintptr_t)PSTR("T - device id\n"));
+ RS232_S((uintptr_t)PSTR("H - HU id\n"));
+ RS232_S((uintptr_t)PSTR("S - read sequence\n"));
+ RS232_S((uintptr_t)PSTR("W - send command\n"));
+ RS232_S((uintptr_t)PSTR("Q - send broadcast\n"));
+ RS232_S((uintptr_t)PSTR("L/l - log on/off\n"));
+ RS232_S((uintptr_t)PSTR("K/k - seq. echo on/off\n"));
+ RS232_S((uintptr_t)PSTR("R/r - register device\n"));
  
  while (1) {
    
 	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
 		LED_ON();
   		AVCLan_Read_Message();
-		// show message
 	} else {
 		LED_OFF();
 		// check command from HU
@@ -220,7 +219,7 @@ int main()
 
 
 // -------------------------------------------------------------------------------------
-// Setup - uP: ATMega16
+// Setup - uP: ATMega88(p)
 //
 void Setup()
 {
@@ -231,7 +230,7 @@ void Setup()
  HU_ID_1 = 0x01;
  HU_ID_2 = 0x60; //was 0x40
 
- logLevel = 1;
+ logLevel = 0;
  echo = 1;
 
  MCUCR = 0; //turn on everything
@@ -247,37 +246,35 @@ void Setup()
  Event = EV_NOTHING;
  sei(); //enable global interupts
 
- //         T  * osc. freq. / prescaler - 1 (error: 1s per 50h)
- OCR1A   = 0.5 *   14745000 /       256 - 1; // Set CTC compare value
+ //      T * osc. freq. / prescaler - 1 (error: 1s per 50h)
+ OCR1A = 1 *   14745000 /       256 - 1; // Set CTC compare value
 
 }
 // -------------------------------------------------------------------------------------
 
 
-u08 s1=0;
+
 //------------------------------------------------------------------------------
-ISR(TIMER1_COMPA_vect)			// Timer1 overflow every .5Sec
-{
-
-	s1++;
-	if (s1==2) {
-		s1=0;
-		
-		cd_Time_Sec=HexInc(cd_Time_Sec);
-		if (cd_Time_Sec==0x60) {
-			cd_Time_Sec = 0;
-			cd_Time_Min=HexInc(cd_Time_Min);
-			if (cd_Time_Min==0xA0) {
-				cd_Time_Min=0x0;
-			}
+//Interupt Service Routine for Timer1 comparator
+//Each second updating cd_Time_Sec and other...
+//then set Event for updating status
+ISR(TIMER1_COMPA_vect) {
+	cd_Time_Sec=HexInc(cd_Time_Sec);
+	if (cd_Time_Sec==0x60) {
+		cd_Time_Sec = 0;
+		cd_Time_Min=HexInc(cd_Time_Min);
+		if (cd_Time_Min==0x60) {
+			cd_Time_Min=0x0;
+			cd_Disc=HexInc(cd_Disc);
 		}
-		if (CD_Mode==stPlay) {
-			// set event to send status in main loop
-			Event |= EV_STATUS;
-		}
+		cd_Track = cd_Time_Min;
 	}
-
-
+	if (CD_Mode==stPlay) {
+		// set event to send status in main loop
+		Event |= EV_STATUS;
+	}
 }
+
+
 //------------------------------------------------------------------------------
 

@@ -19,6 +19,6 @@
 #include "logger.h"
 //------------------------------------------------------------------------------
 
-u08 logLevel;
-u08 echo;
+uint8_t logLevel;
+uint8_t echo;
 

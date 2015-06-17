@@ -28,22 +28,22 @@
 #define __COM232_H
 //------------------------------------------------------------------------------
 
-#include "const.h"
+#include <inttypes.h>
 
 //------------------------------------------------------------------------------
 
-u08 RS232_RxCharBuffer[25], RS232_RxCharBegin, RS232_RxCharEnd;
-u08 readkey;
+uint8_t RS232_RxCharBuffer[25], RS232_RxCharBegin, RS232_RxCharEnd;
+uint8_t readkey;
 //------------------------------------------------------------------------------
 
 void RS232_Init(void);
-void RS232_S(u16 str_addr);
-void RS232_SendByte(u08 Data);
+void RS232_S(uintptr_t str_addr);
+void RS232_SendByte(uint8_t Data);
 void RS232_Print(char* pBuf);
-void RS232_PrintHex4(u08 Data);
-void RS232_PrintHex8(u08 Data);
-void RS232_PrintDec(u08 Data);
-void RS232_PrintDec2(u08 Data);
+void RS232_PrintHex4(uint8_t Data);
+void RS232_PrintHex8(uint8_t Data);
+void RS232_PrintDec(uint8_t Data);
+void RS232_PrintDec2(uint8_t Data);
 
 //------------------------------------------------------------------------------
 // LED

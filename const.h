@@ -22,20 +22,12 @@
 
  May 28 / 2009	- version 2 by Marcin Slonicki
           2015  - version 3 by Jacek Kosek
- 
+
 */
 
 #ifndef __CONST_H
 #define __CONST_H
 //------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-// variable type
-#define u08 unsigned char
-#define u16 unsigned short
-#define u32 unsigned int
-#define u64 unsigned long
 
 
 // port set/unset

@@ -28,7 +28,7 @@
 #ifndef __AVCLANDRV_H
 #define __AVCLANDRV_H
 //------------------------------------------------------------------------------
-#include "const.h"
+#include <inttypes.h>
 
 // Public Macro
 // true if message from some device on AVCLan begin
@@ -43,7 +43,7 @@
 #define STARTEvent sbi(TIMSK1, TOIE1); sbi(UCSR0B, RXCIE0);
 
 // Not used might be useful
-#define CHECK_AVC_LINE		if (INPUT_IS_SET) AVCLan_Read_Message();
+#define CHECK_AVC_LINE	if (INPUT_IS_SET) AVCLan_Read_Message();
 
 // Private: block line eg. you can't read
 void AVC_HoldLine();
@@ -53,14 +53,14 @@ void AVC_ReleaseLine();
 #define MAXMSGLEN	32
 
 // Head Unid ID 1
-extern u08 HU_ID_1;		// 0x01
+uint8_t HU_ID_1;		// 0x01
 // Head Unid ID 2
-extern u08 HU_ID_2;		// 0x40
+uint8_t HU_ID_2;		// 0x40
 
 // Device ID 1
-extern u08 CD_ID_1;		// 0x03
+uint8_t CD_ID_1;		// 0x03
 // Device ID 2
-extern u08 CD_ID_2;		// 0x60
+uint8_t CD_ID_2;		// 0x60
 
 // Commands:
 #define cmNull		0
@@ -70,16 +70,16 @@ extern u08 CD_ID_2;		// 0x60
 #define cmStatus4	4
 
 // JKK public: used in sniffer.c
-#define cmRegister		100
-#define cmInit			101
-#define cmCheck			102
-#define cmPlayIt		103
-#define cmBeep			110
+#define cmRegister	100
+#define cmInit		101
+#define cmCheck		102
+#define cmPlayIt	103
+#define cmBeep		110
 
-#define cmNextTrack		120
-#define cmPrevTrack		121
-#define cmNextDisc		122
-#define cmPrevDisc		123
+#define cmNextTrack	120
+#define cmPrevTrack	121
+#define cmNextDisc	122
+#define cmPrevDisc	123
 
 #define cmScanModeOn	130
 #define cmScanModeOff	131
@@ -94,18 +94,18 @@ typedef enum { stStop=0, stPlay=1 } cd_modes;
 cd_modes CD_Mode;
 
 // Place where whole message is stored during reading
-u08 broadcast;
-u08 master1;
-u08 master2;
-u08 slave1;
-u08 slave2;
-u08 message_len;
-u08 message[MAXMSGLEN];
+uint8_t broadcast;
+uint8_t master1;
+uint8_t master2;
+uint8_t slave1;
+uint8_t slave2;
+uint8_t message_len;
+uint8_t message[MAXMSGLEN];
 
 
-u08 data_control;
-u08 data_len;
-u08 data[MAXMSGLEN];
+uint8_t data_control;
+uint8_t data_len;
+uint8_t data[MAXMSGLEN];
 
 /* Public function AVCLan_Read_Message()
  Read the message, store it, process it, prepare answer.
@@ -123,7 +123,7 @@ u08 data[MAXMSGLEN];
  7. turn interupt again
  8. if for_me what kind of request is needed write in answerReq as cm....
  9. if not brodcast checked and answer is prepared*/
-u08 AVCLan_Read_Message();
+uint8_t AVCLan_Read_Message();
 
 /* send information about status cd track time */
 void AVCLan_Send_Status();
@@ -134,51 +134,51 @@ void AVCLan_Init();
 /* Private */
 void AVCLan_Register();
 
-/*  Public function u08 AVCLan_SendData()
+/*  Public function uint8_t AVCLan_SendData()
   Sends data using the same variables:
   master1 & 2
   slave1 & 2
   message_len
   message[] */
-u08  AVCLan_SendData();
+uint8_t  AVCLan_SendData();
 
-/* Public function u08 AVCLan_SendAnswer()
+/* Public function uint8_t AVCLan_SendAnswer()
 Send right answer for requested command stored in answerReq
 mostly it use AVCLan_SendAnswerFrame which usually forward return
 from one of this this functions:
   AVCLan_SendDataBroadcast();
   AVCLan_SendData;*/
-u08  AVCLan_SendAnswer();
+uint8_t  AVCLan_SendAnswer();
 
-/*  Public function u08 AVCLan_SendData()
+/*  Public function uint8_t AVCLan_SendData()
   Sends data using the same variables:
   master1 & 2
   slave1 & 2
   message_len
   message[] */
-u08  AVCLan_SendDataBroadcast();
+uint8_t  AVCLan_SendDataBroadcast();
 
 // Send command eg: cmBeep
-u08  AVCLan_Command(u08 command); // JKK public: used in sniffer.c
+uint8_t  AVCLan_Command(uint8_t command);
 
 
-u08  HexInc(u08 data);
-u08  HexDec(u08 data);
-u08  Dec2Toy(u08 data);
+uint8_t  HexInc(uint8_t data);
+uint8_t  HexDec(uint8_t data);
+uint8_t  Dec2Toy(uint8_t data);
 
-extern u08 check_timeout;
+uint8_t check_timeout;
 
-extern u08 cd_Disc; // JKK public: used in sniffer.c
-extern u08 cd_Track;
-extern u08 cd_Time_Min;
-extern u08 cd_Time_Sec;
+uint8_t cd_Disc; // JKK public: used in sniffer.c
+uint8_t cd_Track;
+uint8_t cd_Time_Min;
+uint8_t cd_Time_Sec;
 
-extern u08 playMode;
+uint8_t playMode;
 
 // Public: Function send message
-u08 AVCLan_SendMyData(u08 *data_tmp, u08 s_len);
+uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len);
 // Public: Function send brodcast massage
-u08 AVCLan_SendMyDataBroadcast(u08 *data_tmp, u08 s_len);
+uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len);
 
 void ShowInMessage();
 void ShowOutMessage();
@@ -186,6 +186,6 @@ void ShowOutMessage();
 //------------------------------------------------------------------------------
 
 // Public: if answer requested
-extern u08 answerReq;
+uint8_t answerReq;
 //------------------------------------------------------------------------------
 #endif

@@ -43,96 +43,84 @@
 #define AVC_SET_0()  	cbi(PORTD, 6);
 
 
-u08 CD_ID_1;
-u08 CD_ID_2;
+uint8_t CD_ID_1;
+uint8_t CD_ID_2;
 
-u08 HU_ID_1;
-u08 HU_ID_2;
+uint8_t HU_ID_1;
+uint8_t HU_ID_2;
 
-u08 parity_bit;
+uint8_t parity_bit;
 
-u08 repeatMode;
-u08 randomMode;
+uint8_t repeatMode;
+uint8_t randomMode;
 
-u08 playMode;
+uint8_t playMode;
 
-u08 cd_Disc;
-u08 cd_Track;
-u08 cd_Time_Min;
-u08 cd_Time_Sec;
+uint8_t cd_Disc;
+uint8_t cd_Track;
+uint8_t cd_Time_Min;
+uint8_t cd_Time_Sec;
 
-u08 answerReq;
+uint8_t answerReq;
 
 // we need check answer (to avclan check) timeout
 // when is more then 1 min, FORCE answer.
-u08 check_timeout;
+uint8_t check_timeout;
 
-#define SW_ID	0x12
+#define SW_ID	0x25 //was 0x12
 
 // commands
-const u08 stat1[]		= { 0x4,	0x00, 0x00, 0x01, 0x0A };
-const u08 stat2[]		= { 0x4,	0x00, 0x00, 0x01, 0x08 };
-const u08 stat3[]		= { 0x4,	0x00, 0x00, 0x01, 0x0D };
-const u08 stat4[] 		= { 0x4,	0x00, 0x00, 0x01, 0x0C };
-
+const uint8_t stat1[]       = { 0x4, 0x00, 0x00, 0x01, 0x0A };
+const uint8_t stat2[]       = { 0x4, 0x00, 0x00, 0x01, 0x08 };
+const uint8_t stat3[]       = { 0x4, 0x00, 0x00, 0x01, 0x0D };
+const uint8_t stat4[]       = { 0x4, 0x00, 0x00, 0x01, 0x0C };
 // broadcast
-const u08 lan_stat1[]	= { 0x3,	0x00, 0x01, 0x0A };
-const u08 lan_reg[]	= { 0x3,	SW_ID, 0x01, 0x00 };
-const u08 lan_init[]	= { 0x3,	SW_ID, 0x01, 0x01 };
-const u08 lan_check[]	= { 0x3,	SW_ID, 0x01, 0x20 };
-const u08 lan_playit[]	= { 0x4,	SW_ID, 0x01, 0x45, 0x63 };
-
-
-
-const u08 play_req1[]	= { 0x4,	0x00, 0x25, 0x63, 0x80 };
-
+const uint8_t lan_stat1[]   = { 0x3, 0x00, 0x01, 0x0A };
+const uint8_t lan_reg[]     = { 0x3,SW_ID, 0x01, 0x00 };
+const uint8_t lan_init[]    = { 0x3,SW_ID, 0x01, 0x01 };
+const uint8_t lan_check[]   = { 0x3,SW_ID, 0x01, 0x20 };
+const uint8_t lan_playit[]  = { 0x4,SW_ID, 0x01, 0x45, 0x63 };
+const uint8_t play_req1[]   = { 0x4, 0x00, 0x25, 0x63, 0x80 };
 #ifdef __AVENSIS__
-	const u08 play_req2[]	= { 0x6,	0x00, SW_ID, 0x63, 0x42 };
+const uint8_t play_req2[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42 };
 #else
-	const u08 play_req2[]	= { 0x6,	0x00, SW_ID, 0x63, 0x42, 0x01, 0x00 };
+const uint8_t play_req2[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42, 0x01, 0x00 };
 #endif
-
-const u08 play_req3[]	= { 0x6,	0x00, SW_ID, 0x63, 0x42, 0x41, 0x00 };
-const u08 stop_req[]	= { 0x5,	0x00, SW_ID, 0x63, 0x43, 0x01 };
-const u08 stop_req2[]	= { 0x5,	0x00, SW_ID, 0x63, 0x43, 0x41 };
-
-
+const uint8_t play_req3[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42, 0x41, 0x00 };
+const uint8_t stop_req[]    = { 0x5, 0x00,SW_ID, 0x63, 0x43, 0x01 };
+const uint8_t stop_req2[]   = { 0x5, 0x00,SW_ID, 0x63, 0x43, 0x41 };
+const uint8_t btn_scan[]    = { 0x4, 0x00, 0x25, 0x63, 0x95 };
 // answers
-const u08	CMD_REGISTER[]	= {0x1,		0x05,	0x00, 0x01,	SW_ID, 0x10, 0x63 };
-const u08	CMD_STATUS1[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x1A };
-const u08	CMD_STATUS2[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x18 };
-const u08	CMD_STATUS3[]	= {0x1,		0x04,	0x00, 0x01, 0x00, 0x1D };
-const u08	CMD_STATUS4[]	= {0x1,		0x05,	0x00, 0x01, 0x00, 0x1C, 0x00 };
-u08		CMD_CHECK[]	= {0x1,		0x06,	0x00, 0x01, SW_ID, 0x30, 0x00, 0x00 };
-
-const u08	CMD_STATUS5[]	= {0x1,		0x05,	0x00, 0x5C, 0x12, 0x53, 0x02 };
-const u08	CMD_STATUS5A[]	= {0x0,		0x05,	0x5C, 0x31, 0xF1, 0x00, 0x00 };
-
-const u08	CMD_STATUS6[]	= {0x1,		0x06,	0x00, 0x5C, 0x32, 0xF0, 0x02, 0x00 };
-
-
-const u08	CMD_PLAY_OK1[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x50, 0x01 };
-const u08	CMD_PLAY_OK2[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x52, 0x01 };
-const u08	CMD_PLAY_OK3[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x01, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
-u08		CMD_PLAY_OK4[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 };
-
-const u08	CMD_STOP1[]	= {0x1,		0x05,	0x00, 0x63, SW_ID, 0x53, 0x01 };
-u08		CMD_STOP2[]	= {0x0,		0x0B,	0x63, 0x31, 0xF1, 0x00, 0x30, 0x00, 0x00,0x00, 0x00, 0x00, 0x80 };
-
-const u08	CMD_BEEP[]	= {0x1,		0x05,	0x00, 0x63, 0x29, 0x60, 0x02 };
+const uint8_t CMD_REGISTER[]= { 0x1, 0x05, 0x00, 0x01,SW_ID, 0x10, 0x63 };
+const uint8_t CMD_STATUS1[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x1A };
+const uint8_t CMD_STATUS2[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x18 };
+const uint8_t CMD_STATUS3[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x1D };
+const uint8_t CMD_STATUS4[] = { 0x1, 0x05, 0x00, 0x01, 0x00, 0x1C, 0x00 };
+      uint8_t CMD_CHECK[]   = { 0x1, 0x06, 0x00, 0x01,SW_ID, 0x30, 0x00, 0x00 };
+const uint8_t CMD_STATUS5[] = { 0x1, 0x05, 0x00, 0x5C, 0x12, 0x53, 0x02 };
+const uint8_t CMD_STATUS5A[]= { 0x0, 0x05, 0x5C, 0x31, 0xF1, 0x00, 0x00 };
+const uint8_t CMD_STATUS6[] = { 0x1, 0x06, 0x00, 0x5C, 0x32, 0xF0, 0x02, 0x00 };
+const uint8_t CMD_PLAY_OK1[]= { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x50, 0x01 };
+const uint8_t CMD_PLAY_OK2[]= { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x52, 0x01 };
+const uint8_t CMD_PLAY_OK3[]= { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
+      uint8_t CMD_PLAY_OK4[]= { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 };
+const uint8_t CMD_STOP1[]   = { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x53, 0x01 };
+      uint8_t CMD_STOP2[]   = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x30, 0x00, 0x00,0x00, 0x00, 0x00, 0x80 };
+const uint8_t CMD_BEEP[]    = { 0x1, 0x05, 0x00, 0x63, 0x29, 0x60, 0x02 };
 
 //------------------------------------------------------------------------------
 
 
 
 //------------------------------------------------------------------------------
+// Low Level function
 void AVC_HoldLine()
 {
  STOPEvent;
 
  // wait for free line
- u08 T=0;
- u08 line_busy = 1;
+ uint8_t T=0;
+ uint8_t line_busy = 1;
 
  timer0_source(CK64);
  timer0_start();
@@ -151,6 +139,7 @@ void AVC_HoldLine()
  STARTEvent;
 }
 //------------------------------------------------------------------------------
+// Low Level function
 void AVC_ReleaseLine()
 {
  AVC_SET_0();
@@ -187,8 +176,8 @@ void AVCLan_Init()
  answerReq     = cmNull;
  check_timeout = 0;
 
- cd_Disc = 1;
- cd_Track = 1;
+ cd_Disc = 0;
+ cd_Track = 0;
  cd_Time_Min = 0;
  cd_Time_Sec = 0;
  repeatMode = 0;
@@ -198,10 +187,11 @@ void AVCLan_Init()
 
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Read_Byte(u08 length)
+// Low Level function
+uint8_t AVCLan_Read_Byte(uint8_t length)
 {
- u08 byte = 0;
- u08 wT;
+ uint8_t byte = 0;
+ uint8_t wT;
  
  while (1) {
    while (INPUT_IS_CLEAR);
@@ -219,7 +209,7 @@ u08 AVCLan_Read_Byte(u08 length)
 }
 //------------------------------------------------------------------------------
 
-u08 AVCLan_Send_StartBit()
+uint8_t AVCLan_Send_StartBit()
 {
  AVC_SET_1();
  //measured about 166us target is 166
@@ -254,9 +244,9 @@ void AVCLan_Send_Bit0()
  _delay_us(5);								// 00-09
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Read_ACK()
+uint8_t AVCLan_Read_ACK()
 {
- u08 time = 0;
+ uint8_t time = 0;
 
  AVC_SET_1();
  _delay_us(19);
@@ -280,7 +270,7 @@ u08 AVCLan_Read_ACK()
 
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Send_ACK()
+uint8_t AVCLan_Send_ACK()
 {	
  timer0_source(CK64);						//update every 1us
  timer0_start();	
@@ -302,9 +292,9 @@ u08 AVCLan_Send_ACK()
  return 1;		
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Send_Byte(u08 byte, u08 len)
+uint8_t AVCLan_Send_Byte(uint8_t byte, uint8_t len)
 {
- u08 b;
+ uint8_t b;
  if (len==8) {
  	b = byte;
  } else {
@@ -328,7 +318,7 @@ u08 AVCLan_Send_Byte(u08 byte, u08 len)
 
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Send_ParityBit()
+uint8_t AVCLan_Send_ParityBit()
 {
  if ( (parity_bit & 1)!=0 ) {
      AVCLan_Send_Bit1();
@@ -340,11 +330,11 @@ u08 AVCLan_Send_ParityBit()
  return 1;
 }
 //------------------------------------------------------------------------------
-u08 CheckCmd(u08 *cmd)
+uint8_t CheckCmd(uint8_t *cmd)
 {
- u08 i;
- u08 *c;
- u08 l;
+ uint8_t i;
+ uint8_t *c;
+ uint8_t l;
 
  c = cmd;
  l = *c++;
@@ -356,14 +346,14 @@ u08 CheckCmd(u08 *cmd)
  return 1;
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_Read_Message()
+uint8_t AVCLan_Read_Message()
 {
  STOPEvent;						// disable timer1 interrupt
 
- u08 T = 0;
+ uint8_t T = 0;
 
- u08 i;
- u08 for_me = 0;
+ uint8_t i;
+ uint8_t for_me = 0;
 
  //RS232_Print("$ ");
  timer0_source(CK64);
@@ -458,28 +448,29 @@ u08 AVCLan_Read_Message()
 
  if (for_me) {
  	
-	if (CheckCmd((u08*)stat1)) { answerReq = cmStatus1; return 1; }
-	if (CheckCmd((u08*)stat2)) { answerReq = cmStatus2; return 1; }
-	if (CheckCmd((u08*)stat3)) { answerReq = cmStatus3; return 1; }
-	if (CheckCmd((u08*)stat4)) { answerReq = cmStatus4; return 1; }
+	if (CheckCmd((uint8_t*)stat1)) { answerReq = cmStatus1; return 1; }
+	if (CheckCmd((uint8_t*)stat2)) { answerReq = cmStatus2; return 1; }
+	if (CheckCmd((uint8_t*)stat3)) { answerReq = cmStatus3; return 1; }
+	if (CheckCmd((uint8_t*)stat4)) { answerReq = cmStatus4; return 1; }
 
-	if (CheckCmd((u08*)play_req1)) { answerReq = cmPlayReq1; return 1; }
-	if (CheckCmd((u08*)play_req2)) { answerReq = cmPlayReq2; return 1; }
-	if (CheckCmd((u08*)play_req3)) { answerReq = cmPlayReq3; return 1; }
-	if (CheckCmd((u08*)stop_req))  { answerReq = cmStopReq;  return 1; }
-	if (CheckCmd((u08*)stop_req2)) { answerReq = cmStopReq2; return 1; }
+	if (CheckCmd((uint8_t*)play_req1)) { answerReq = cmPlayReq1; return 1; }
+	if (CheckCmd((uint8_t*)play_req2)) { answerReq = cmPlayReq2; return 1; }
+	if (CheckCmd((uint8_t*)play_req3)) { answerReq = cmPlayReq3; return 1; }
+	if (CheckCmd((uint8_t*)stop_req))  { answerReq = cmStopReq;  return 1; }
+	if (CheckCmd((uint8_t*)stop_req2)) { answerReq = cmStopReq2; return 1; }
+        if (CheckCmd((uint8_t*)btn_scan))  { answerReq = cmNull; RS232_Print("Btn Scan\n"); return 1; }
 
  } else { // broadcast check
 
-	if (CheckCmd((u08*)lan_playit))	{ answerReq = cmPlayIt;	return 1; }
-	if (CheckCmd((u08*)lan_check))	{ 
+	if (CheckCmd((uint8_t*)lan_playit))	{ answerReq = cmPlayIt;	return 1; }
+	if (CheckCmd((uint8_t*)lan_check))	{ 
 			answerReq = cmCheck;
 			CMD_CHECK[6]=message[3];
 			return 1; 
 	}
-	if (CheckCmd((u08*)lan_reg))	{ answerReq = cmRegister;	return 1; }
-	if (CheckCmd((u08*)lan_init))	{ answerReq = cmInit;		return 1; }
-	if (CheckCmd((u08*)lan_stat1))	{ answerReq = cmStatus1;	return 1; }
+	if (CheckCmd((uint8_t*)lan_reg))	{ answerReq = cmRegister;	return 1; }
+	if (CheckCmd((uint8_t*)lan_init))	{ answerReq = cmInit;		return 1; }
+	if (CheckCmd((uint8_t*)lan_stat1))	{ answerReq = cmStatus1;	return 1; }
 
 
  }
@@ -487,15 +478,15 @@ u08 AVCLan_Read_Message()
  return 1;
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendData()
+uint8_t AVCLan_SendData()
 {
- u08 i;
+ uint8_t i;
 
  STOPEvent;
 
  // wait for free line
- u08 T=0;
- u08 line_busy = 1;
+ uint8_t T=0;
+ uint8_t line_busy = 1;
 
  timer0_source(CK64);
  timer0_start();
@@ -572,15 +563,15 @@ u08 AVCLan_SendData()
  return 0;
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendDataBroadcast()
+uint8_t AVCLan_SendDataBroadcast()
 {
- u08 i;
+ uint8_t i;
 
  STOPEvent;
 
  // wait for free line
- u08 T=0;
- u08 line_busy = 1;
+ uint8_t T=0;
+ uint8_t line_busy = 1;
 
  timer0_source(CK64);
  timer0_start();
@@ -628,11 +619,11 @@ u08 AVCLan_SendDataBroadcast()
  return 0;
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendAnswerFrame(u08 *cmd)
+uint8_t AVCLan_SendAnswerFrame(uint8_t *cmd)
 {
- u08 i;
- u08 *c;
- u08 b;
+ uint8_t i;
+ uint8_t *c;
+ uint8_t b;
 
  c = cmd;
  
@@ -648,10 +639,10 @@ u08 AVCLan_SendAnswerFrame(u08 *cmd)
  	return AVCLan_SendDataBroadcast();
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendMyData(u08 *data_tmp, u08 s_len)
+uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len)
 {
- u08 i;
- u08 *c;
+ uint8_t i;
+ uint8_t *c;
  
  c = data_tmp;
  
@@ -663,10 +654,10 @@ u08 AVCLan_SendMyData(u08 *data_tmp, u08 s_len)
  return AVCLan_SendData();
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendMyDataBroadcast(u08 *data_tmp, u08 s_len)
+uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len)
 {
- u08 i;
- u08 *c;
+ uint8_t i;
+ uint8_t *c;
  
 
  c = data_tmp;
@@ -679,31 +670,31 @@ u08 AVCLan_SendMyDataBroadcast(u08 *data_tmp, u08 s_len)
  return AVCLan_SendDataBroadcast();
 }
 //------------------------------------------------------------------------------
-u08 AVCLan_SendInitCommands()
+uint8_t AVCLan_SendInitCommands()
 {
- u08 r;
+ uint8_t r;
 
- const u08 c1[] = { 0x0, 0x0B,		0x63, 0x31, 0xF1, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
- const u08 c2[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x02 };
- const u08 c3[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 c4[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x3D, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 c5[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x39, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 c6[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x31, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 c7[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x21, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 c8[] = { 0x0, 0x0B,		0x63, 0x31, 0xF1, 0x00, 0x90, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
- const u08 c9[] = { 0x0, 0x0A,		0x63, 0x31, 0xF3, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const u08 cA[] = { 0x0, 0x0B,		0x63, 0x31, 0xF1, 0x00, 0x30, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
+ const uint8_t c1[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
+ const uint8_t c2[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x02 };
+ const uint8_t c3[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t c4[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3D, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t c5[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x39, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t c6[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x31, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t c7[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x21, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t c8[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x90, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
+ const uint8_t c9[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02 };
+ const uint8_t cA[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x30, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
 
- r = AVCLan_SendAnswerFrame((u08*)c1);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c2);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c3);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c4);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c5);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c6);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c7);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c8);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)c9);
- if (!r) r = AVCLan_SendAnswerFrame((u08*)cA);
+ r = AVCLan_SendAnswerFrame((uint8_t*)c1);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c2);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c3);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c4);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c5);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c6);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c7);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c8);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c9);
+ if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)cA);
 
  return r;
 }
@@ -711,7 +702,7 @@ u08 AVCLan_SendInitCommands()
 void AVCLan_Send_Status()
 {
 //                                                        disc  track t_min t_sec
- u08 STATUS[] = {0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x10, 0x01, 0x01, 0x00, 0x00, 0x00, 0x80 };
+ uint8_t STATUS[] = {0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x10, 0x01, 0x01, 0x00, 0x00, 0x00, 0x80 };
 	
  STATUS[7] =  cd_Disc;
  STATUS[8] =  cd_Track;
@@ -720,41 +711,41 @@ void AVCLan_Send_Status()
 
  STATUS[11] = 0;
 
- AVCLan_SendAnswerFrame((u08*)STATUS);
+ AVCLan_SendAnswerFrame((uint8_t*)STATUS);
 }
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-u08 AVCLan_SendAnswer()
+uint8_t AVCLan_SendAnswer()
 {
- u08 r = 0 ;
+ uint8_t r = 0 ;
  
  switch (answerReq) {
- 	case cmStatus1:		r = AVCLan_SendAnswerFrame((u08*)CMD_STATUS1); 
+ 	case cmStatus1:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STATUS1); 
 						break;
- 	case cmStatus2:		r = AVCLan_SendAnswerFrame((u08*)CMD_STATUS2); 
+ 	case cmStatus2:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STATUS2); 
 						break;
- 	case cmStatus3:		r = AVCLan_SendAnswerFrame((u08*)CMD_STATUS3); 
+ 	case cmStatus3:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STATUS3); 
 						break;
- 	case cmStatus4:		r = AVCLan_SendAnswerFrame((u08*)CMD_STATUS4); 
+ 	case cmStatus4:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STATUS4); 
 						break;
- 	case cmRegister:	r = AVCLan_SendAnswerFrame((u08*)CMD_REGISTER); 
+ 	case cmRegister:	r = AVCLan_SendAnswerFrame((uint8_t*)CMD_REGISTER); 
 						break;
  	case cmInit:
 						r = AVCLan_SendInitCommands(); 
 						break;
- 	case cmCheck:		r = AVCLan_SendAnswerFrame((u08*)CMD_CHECK); 
+ 	case cmCheck:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_CHECK); 
 						check_timeout = 0;
 						CMD_CHECK[6]++;
  						RS232_Print("AVCCHK\n");
 						break;
  	case cmPlayReq1:	playMode = 0;
-						r = AVCLan_SendAnswerFrame((u08*)CMD_PLAY_OK1); 
+						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_PLAY_OK1); 
 						break;
  	case cmPlayReq2:	
 	case cmPlayReq3:	playMode = 0;
-						r = AVCLan_SendAnswerFrame((u08*)CMD_PLAY_OK2); 
-						if (!r) r = AVCLan_SendAnswerFrame((u08*)CMD_PLAY_OK3);
+						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_PLAY_OK2); 
+						if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)CMD_PLAY_OK3);
 						CD_Mode = stPlay;
 						break;
 	case cmPlayIt:		playMode = 1;
@@ -763,7 +754,7 @@ u08 AVCLan_SendAnswer()
 						CMD_PLAY_OK4[8]=cd_Track;
 						CMD_PLAY_OK4[9]=cd_Time_Min;
 						CMD_PLAY_OK4[10]=cd_Time_Sec;
-						r = AVCLan_SendAnswerFrame((u08*)CMD_PLAY_OK4); 
+						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_PLAY_OK4); 
 						if (!r) AVCLan_Send_Status();
 						CD_Mode = stPlay;
 						break;
@@ -771,14 +762,14 @@ u08 AVCLan_SendAnswer()
 	case cmStopReq2:	CD_Mode = stStop;
 						playMode = 0;
 						
-						r = AVCLan_SendAnswerFrame((u08*)CMD_STOP1); 
+						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STOP1); 
 						CMD_STOP2[7]=cd_Disc;
 						CMD_STOP2[8]=cd_Track;
 						CMD_STOP2[9]=cd_Time_Min;
 						CMD_STOP2[10]=cd_Time_Sec;
-						r = AVCLan_SendAnswerFrame((u08*)CMD_STOP2); 
+						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_STOP2); 
 						break;
-	case cmBeep:		AVCLan_SendAnswerFrame((u08*)CMD_BEEP);
+	case cmBeep:		AVCLan_SendAnswerFrame((uint8_t*)CMD_BEEP);
 						break;
  }
 
@@ -789,15 +780,15 @@ u08 AVCLan_SendAnswer()
 void AVCLan_Register()
 {
  RS232_Print("REG_ST\n");
- AVCLan_SendAnswerFrame((u08*)CMD_REGISTER); 
+ AVCLan_SendAnswerFrame((uint8_t*)CMD_REGISTER); 
  RS232_Print("REG_END\n");
  //AVCLan_Command( cmRegister );
  AVCLan_Command( cmInit );
 }
 //------------------------------------------------------------------------------
-u08	 AVCLan_Command(u08 command)
+uint8_t	 AVCLan_Command(uint8_t command)
 {
- u08 r;
+ uint8_t r;
 
  answerReq = command;
  r = AVCLan_SendAnswer(); 
@@ -809,7 +800,7 @@ u08	 AVCLan_Command(u08 command)
  return r;
 }
 //------------------------------------------------------------------------------
-u08 HexInc(u08 data)
+uint8_t HexInc(uint8_t data)
 {
  if ((data & 0x9)==0x9) 
  	return (data + 7);
@@ -817,7 +808,7 @@ u08 HexInc(u08 data)
  return (data+1);
 }
 //------------------------------------------------------------------------------
-u08 HexDec(u08 data)
+uint8_t HexDec(uint8_t data)
 {
  if ((data & 0xF)==0) 
  	return (data - 7);
@@ -827,10 +818,10 @@ u08 HexDec(u08 data)
 //------------------------------------------------------------------------------
 // encode decimal valute to 'toyota' format :-)
 //  ex.   42 (dec)   =  0x42 (toy)
-u08 Dec2Toy(u08 data)
+uint8_t Dec2Toy(uint8_t data)
 {
- u08 d,d1;
- d = (u32)data/(u32)10;
+ uint8_t d,d1;
+ d = (uint32_t)data/(uint32_t)10;
  d1 = d * 16;
  d  = d1 + (data - 10*d);
  return d;
@@ -843,9 +834,9 @@ void ShowInMessage()
  AVC_HoldLine();
  
 
- RS232_S((u16)PSTR("HU < ("));
+ RS232_S((uintptr_t)PSTR("HU < ("));
 
- if (broadcast==0) RS232_S((u16)PSTR("bro) "));
+ if (broadcast==0) RS232_S((uintptr_t)PSTR("bro) "));
  else RS232_Print("dir) ");
 
  RS232_PrintHex4(master1);
@@ -855,7 +846,7 @@ void ShowInMessage()
  RS232_PrintHex8(slave2);
  RS232_Print("| ");
  
- u08 i;
+ uint8_t i;
  for (i=0;i<message_len;i++) {
 	RS232_PrintHex8(message[i]);
 	RS232_Print(" ");
@@ -867,11 +858,11 @@ void ShowInMessage()
 //------------------------------------------------------------------------------
 void ShowOutMessage()
 {
- u08 i;
+ uint8_t i;
 
  AVC_HoldLine();
  
- RS232_S((u16)PSTR("out > "));
+ RS232_S((uintptr_t)PSTR("out > "));
  for (i=0; i<data_len; i++) {
 	RS232_PrintHex8(data[i]);
 	RS232_SendByte(' ');

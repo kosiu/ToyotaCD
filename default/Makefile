@@ -13,8 +13,10 @@ COMMON = -mmcu=$(MCU)
 
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -DF_CPU=14745000UL -Os -fsigned-char
+CFLAGS += -Wall -gdwarf-2 -DF_CPU=14745000UL -O2 -fsigned-char
+CFLAGS += -std=c99 -pedantic -Wextra -Wunused-variable
 CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
+
 
 ## Assembly specific flags
 ASMFLAGS = $(COMMON)
