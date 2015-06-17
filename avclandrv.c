@@ -36,12 +36,27 @@
 
 
 //------------------------------------------------------------------------------
+// Preprocesor Definitions
 
 #define AVC_OUT_EN()	sbi(PORTD, 6); sbi(DDRD, 6);  sbi(DDRD, 7); sbi(ACSR, ACD); 
 #define AVC_OUT_DIS()	cbi(PORTD, 6); cbi(DDRD, 6);  cbi(DDRD, 7); cbi(ACSR, ACD);
 #define AVC_SET_1()  	sbi(PORTD, 6);
 #define AVC_SET_0()  	cbi(PORTD, 6);
 
+/* Private macro */
+#define INPUT_IS_CLEAR (!(ACSR & _BV(ACO)))
+
+// Private timers interupt on off to be checked
+#define STOPEvent  cbi(TIMSK1, TOIE1); cbi(UCSR0B, RXCIE0);
+// Private timers interupt on off to be checked
+#define STARTEvent sbi(TIMSK1, TOIE1); sbi(UCSR0B, RXCIE0);
+
+// Not used might be useful
+#define CHECK_AVC_LINE	if (INPUT_IS_SET) AVCLan_Read_Message();
+
+
+//------------------------------------------------------------------------------
+// Global varibles Definitions
 
 uint8_t CD_ID_1;
 uint8_t CD_ID_2;
@@ -49,24 +64,42 @@ uint8_t CD_ID_2;
 uint8_t HU_ID_1;
 uint8_t HU_ID_2;
 
-uint8_t parity_bit;
-
-uint8_t repeatMode;
-uint8_t randomMode;
-
-uint8_t playMode;
-
 uint8_t cd_Disc;
 uint8_t cd_Track;
 uint8_t cd_Time_Min;
 uint8_t cd_Time_Sec;
 
+uint8_t playMode;
+
+// if answer requested
 uint8_t answerReq;
+
+
+//Not in the header----------------------------------
+uint8_t broadcast;
+uint8_t master1;
+uint8_t master2;
+uint8_t slave1;
+uint8_t slave2;
+uint8_t message_len;
+uint8_t message[MAXMSGLEN];
+
+uint8_t data_control;
+uint8_t data_len;
+uint8_t data[MAXMSGLEN];
+
+uint8_t parity_bit;
+
+uint8_t repeatMode;
+uint8_t randomMode;
 
 // we need check answer (to avclan check) timeout
 // when is more then 1 min, FORCE answer.
 uint8_t check_timeout;
 
+
+
+//---------------------------------------------------
 #define SW_ID	0x25 //was 0x12
 
 // commands
@@ -109,8 +142,44 @@ const uint8_t CMD_STOP1[]   = { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x53, 0x01 };
 const uint8_t CMD_BEEP[]    = { 0x1, 0x05, 0x00, 0x63, 0x29, 0x60, 0x02 };
 
 //------------------------------------------------------------------------------
+// Functions Declaration
+
+// Private: block line eg. you can't read
+void AVC_HoldLine();
+// Private: (not used in main program)
+void AVC_ReleaseLine();
 
 
+void ShowInMessage();
+void ShowOutMessage();
+
+// compare what is in the global varibale message[] with comand from argument
+// return:
+// 1 - the same
+// 0 - difference
+uint8_t CheckCmd(uint8_t *cmd);
+
+// puts command from argument to global variable data and send brodcasted or not
+// using: AVCLan_SendData() or AVCLan_SendDataBroadcast()
+uint8_t AVCLan_SendAnswerFrame(uint8_t *cmd);
+
+// this is kind of the test sends different commands and chack if there is any answer
+uint8_t AVCLan_SendInitCommands();
+
+uint8_t  HexDec(uint8_t data);
+uint8_t  Dec2Toy(uint8_t data);
+
+// more atomic functions (hardware layer)
+void AVC_HoldLine(); 				     // Low Level function
+void AVC_ReleaseLine(); 			     // Low Level function
+uint8_t AVCLan_Read_Byte(uint8_t length);	     // Low Level function
+uint8_t AVCLan_Send_StartBit(); 		     // Low Level function
+void AVCLan_Send_Bit1(); 			     // Low Level function
+void AVCLan_Send_Bit0(); 			     // Low Level function
+uint8_t AVCLan_Read_ACK(); 			     // Low Level function
+uint8_t AVCLan_Send_ACK(); 			     // Low Level function
+uint8_t AVCLan_Send_Byte(uint8_t byte, uint8_t len); // Low Level function
+uint8_t AVCLan_Send_ParityBit(); 		     // Low Level function
 
 //------------------------------------------------------------------------------
 // Low Level function
