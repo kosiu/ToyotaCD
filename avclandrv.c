@@ -97,7 +97,7 @@ uint8_t check_timeout;
 
 
 //---------------------------------------------------
-#define SW_ID	0x25 //was 0x12
+#define SW_ID	0x12
 
 // commands
 const uint8_t stat1[]       = { 0x4, 0x00, 0x00, 0x01, 0x0A };
