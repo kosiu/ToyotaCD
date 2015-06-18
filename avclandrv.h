@@ -162,6 +162,45 @@ uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len);
 // Public: Function send brodcast massage
 uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len);
 
+//==================================================================================================
+// New struct
+typedef enum
+{
+  ia=0  
+} AvcMsgID;
+
+
+typedef enum
+{   // No this is not a mistake, broadcast = 0!
+    MSG_NORMAL      = 1,
+    MSG_BCAST       = 0
+
+} AvcMsgMode;
+
+typedef struct
+{
+    AvcMsgID   ID;             // Message ID
+    AvcMsgMode Mode;           // Transmission mode: normal (1) or broadcast (0).
+    uint16_t   Master_ID;      // Sender ID
+    uint16_t   Slave_ID;       // Reciever ID
+    uint8_t    DataSize;       // Payload data size (bytes).
+    uint8_t    Data[11];       // Payload data
+    uint16_t   IgnoreMask;     // When reading which field can be ignored including Modes and IDs
+    char       Description[17];// ASCII description of the command for terminal dump.
+    
+} AvcMessageStruct;
+
+extern uint16_t avcHU_Address;
+extern uint16_t avcMY_Address;
+extern uint16_t avcBrodcast_Address;
+
+extern AvcMessageStruct avcInMsg;
+extern AvcMessageStruct avcOutMsg;
+
+AvcMsgID avcReadMsg();
+uint8_t avcProcessMsg(AvcMsgID);
+uint8_t avcSendMsg();
+uint8_t avcSendStatusMsg();
 
 //------------------------------------------------------------------------------
 #endif
