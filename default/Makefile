@@ -37,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = sniffer.o avclandrv.o com232.o logger.o 
+OBJECTS = sniffer.o avclandrv.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -50,12 +50,6 @@ sniffer.o: ../sniffer.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 avclandrv.o: ../avclandrv.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
-
-com232.o: ../com232.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
-
-logger.o: ../logger.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 

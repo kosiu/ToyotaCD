@@ -35,40 +35,6 @@
 // true if message from some device on AVCLan begin
 #define INPUT_IS_SET (ACSR & _BV(ACO))
 
-// Check and read Message                                                                                                                  
-#define CHECK_AVC_LINE  if (INPUT_IS_SET) AVCLan_Read_Message();                                                                             
-
-
-
-#define MAXMSGLEN	32
-
-// Commands:
-#define cmNull		0
-#define cmStatus1	1
-#define cmStatus2	2
-#define cmStatus3	3
-#define cmStatus4	4
-
-// JKK public: used in sniffer.c
-#define cmRegister	100 //0x64
-#define cmInit		101 //0x65
-#define cmCheck		102 //0x66
-#define cmPlayIt	103 //0x67
-#define cmBeep		110 //0x6E
-
-#define cmNextTrack	120 //0x78
-#define cmPrevTrack	121 //0x79
-#define cmNextDisc	122 //0x7A
-#define cmPrevDisc	123 //0x7B
-
-#define cmScanModeOn	130 //0x82
-#define cmScanModeOff	131 //0x83
-
-#define cmPlayReq1	5
-#define cmPlayReq2	6
-#define cmPlayReq3	7
-#define cmStopReq	8
-#define cmStopReq2	9
 
 typedef enum { stStop=0, stPlay=1 } cd_modes;
 cd_modes CD_Mode;
@@ -89,8 +55,6 @@ extern uint8_t cd_Disc;
 extern uint8_t cd_Track;
 extern uint8_t cd_Time_Min;
 extern uint8_t cd_Time_Sec;
-
-extern uint8_t playMode;
 
 // if answer requested
 extern uint8_t answerReq;
@@ -124,9 +88,6 @@ void AVCLan_Send_Status();
 // Initialize AVCLan
 void AVCLan_Init();
 
-/* Sends only register line */
-void AVCLan_Register();
-
 /*  Public function uint8_t AVCLan_SendData()
   Sends data using the same variables:
   master1 & 2
@@ -143,24 +104,8 @@ from one of this this functions:
   AVCLan_SendData;*/
 uint8_t  AVCLan_SendAnswer();
 
-/*  Public function uint8_t AVCLan_SendData()
-  Sends data using the same variables:
-  master1 & 2
-  slave1 & 2
-  message_len
-  message[] */
-uint8_t  AVCLan_SendDataBroadcast();
-
-// Send command eg: cmBeep
-uint8_t  AVCLan_Command(uint8_t command);
-
 // Increment Toyota Type
 uint8_t  HexInc(uint8_t data);
-
-// Public: Function send message
-uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len);
-// Public: Function send brodcast massage
-uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len);
 
 //==================================================================================================
 // New struct

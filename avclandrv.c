@@ -23,16 +23,13 @@
  May 28 / 2009	- version 2
 
 */
-
+#include "const.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #include "timer.h"
 #include "avclandrv.h"
-#include "com232.h"
-#include "const.h"
-#include "logger.h"
 
 
 //------------------------------------------------------------------------------
@@ -51,6 +48,40 @@
 // Private timers interupt on off to be checked
 #define STARTEvent sbi(TIMSK1, TOIE1); sbi(UCSR0B, RXCIE0);
 
+// Check and read Message                                                                                                                  
+#define CHECK_AVC_LINE  if (INPUT_IS_SET) AVCLan_Read_Message();                                                                             
+
+
+
+#define MAXMSGLEN	32
+
+// Commands:
+#define cmNull		0
+#define cmStatus1	1
+#define cmStatus2	2
+#define cmStatus3	3
+#define cmStatus4	4
+
+// JKK public: used in sniffer.c
+#define cmRegister	100 //0x64
+#define cmInit		101 //0x65
+#define cmCheck		102 //0x66
+#define cmPlayIt	103 //0x67
+#define cmBeep		110 //0x6E
+
+#define cmNextTrack	120 //0x78
+#define cmPrevTrack	121 //0x79
+#define cmNextDisc	122 //0x7A
+#define cmPrevDisc	123 //0x7B
+
+#define cmScanModeOn	130 //0x82
+#define cmScanModeOff	131 //0x83
+
+#define cmPlayReq1	5
+#define cmPlayReq2	6
+#define cmPlayReq3	7
+#define cmStopReq	8
+#define cmStopReq2	9
 
 //------------------------------------------------------------------------------
 // Global varibles Definitions
@@ -93,8 +124,6 @@ uint8_t randomMode;
 // we need check answer (to avclan check) timeout
 // when is more then 1 min, FORCE answer.
 uint8_t check_timeout;
-
-
 
 //---------------------------------------------------
 #define SW_ID	0x12
@@ -141,14 +170,40 @@ const uint8_t CMD_BEEP[]    = { 0x1, 0x05, 0x00, 0x63, 0x29, 0x60, 0x02 };
 //------------------------------------------------------------------------------
 // Functions Declaration
 
+
+/* Sends only register line */
+void AVCLan_Register();
+
+/*  Public function uint8_t AVCLan_SendData()
+  Sends data using the same variables:
+  master1 & 2
+  slave1 & 2
+  message_len
+  message[] */
+uint8_t  AVCLan_SendData();
+
+/*  Public function uint8_t AVCLan_SendData()
+  Sends data using the same variables:
+  master1 & 2
+  slave1 & 2
+  message_len
+  message[] */
+uint8_t  AVCLan_SendDataBroadcast();
+
+// Send command eg: cmBeep
+uint8_t  AVCLan_Command(uint8_t command);
+
+
+// Public: Function send message
+uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len);
+// Public: Function send brodcast massage
+uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len);
+
 // Private: block line eg. you can't read
 void AVC_HoldLine();
 // Private: (not used in main program)
 void AVC_ReleaseLine();
 
-
-void ShowInMessage();
-void ShowOutMessage();
 
 // compare what is in the global varibale message[] with comand from argument
 // return:
@@ -376,7 +431,6 @@ uint8_t AVCLan_Send_Byte(uint8_t byte, uint8_t len)
    }
    len--;
    if (!len) { 
-     //if (INPUT_IS_SET) RS232_Print("SBER\n"); // Send Bit ERror
      return 1;
    }
    b = b << 1;
@@ -421,7 +475,6 @@ uint8_t AVCLan_Read_Message()
  uint8_t i;
  uint8_t for_me = 0;
 
- //RS232_Print("$ ");
  timer0_source(CK64);
 
  // check start bit
@@ -430,7 +483,6 @@ uint8_t AVCLan_Read_Message()
  	T=TCNT0;
 	if (T>254) {
 		STARTEvent;
-		RS232_Print("LAN>T1\n");
 		return 0;
 	}
  }
@@ -438,7 +490,6 @@ uint8_t AVCLan_Read_Message()
 
  if (T<10) {		// !!!!!!! 20 !!!!!!!!!!!
  	STARTEvent;
-	RS232_Print("LAN>T2\n");
 	return 0;
  }
 
@@ -488,7 +539,6 @@ uint8_t AVCLan_Read_Message()
  		else AVCLan_Read_Byte(1);
 
  if (message_len > MAXMSGLEN) {
-//	RS232_Print("LAN> Command error");
 	STARTEvent;
 	return 0;
  }
@@ -510,8 +560,7 @@ uint8_t AVCLan_Read_Message()
 
  STARTEvent;
 
- if (logLevel>0) ShowInMessage();
-
+ 
  if (for_me) {
  	
 	if (CheckCmd((uint8_t*)stat1)) { answerReq = cmStatus1; return 1; }
@@ -524,7 +573,7 @@ uint8_t AVCLan_Read_Message()
 	if (CheckCmd((uint8_t*)play_req3)) { answerReq = cmPlayReq3; return 1; }
 	if (CheckCmd((uint8_t*)stop_req))  { answerReq = cmStopReq;  return 1; }
 	if (CheckCmd((uint8_t*)stop_req2)) { answerReq = cmStopReq2; return 1; }
-        if (CheckCmd((uint8_t*)btn_scan))  { answerReq = cmNull; RS232_Print("Btn Scan\n"); return 1; }
+        if (CheckCmd((uint8_t*)btn_scan))  { answerReq = cmNull; return 1; }//button
 
  } else { // broadcast check
 
@@ -585,7 +634,6 @@ uint8_t AVCLan_SendData()
  if (AVCLan_Read_ACK()) {
  	 AVC_OUT_DIS();
 	 STARTEvent;
-	 RS232_Print("E1\n");
 	 return 1;
  }
 
@@ -595,7 +643,6 @@ uint8_t AVCLan_SendData()
  if (AVCLan_Read_ACK()) {
  	 AVC_OUT_DIS();
 	 STARTEvent;
-	 RS232_Print("E2\n");
 	 return 2;
  }
 
@@ -604,7 +651,6 @@ uint8_t AVCLan_SendData()
  if (AVCLan_Read_ACK()) {
  	 AVC_OUT_DIS();
 	 STARTEvent;
-	 RS232_Print("E3\n");
 	 return 3;
  }
 
@@ -614,9 +660,6 @@ uint8_t AVCLan_SendData()
  	if (AVCLan_Read_ACK()) {
 	 	 AVC_OUT_DIS();
 		 STARTEvent;
- 		 RS232_Print("E4(");
-		 RS232_PrintDec(i);
-		 RS232_Print(")\n");
 		 return 4;
  	}
  }
@@ -625,7 +668,6 @@ uint8_t AVCLan_SendData()
  AVC_OUT_DIS();
 
  STARTEvent;
- if (logLevel>0) ShowOutMessage();
  return 0;
 }
 //------------------------------------------------------------------------------
@@ -681,7 +723,6 @@ uint8_t AVCLan_SendDataBroadcast()
 
  AVC_OUT_DIS();
  STARTEvent;
- if (logLevel>0) ShowOutMessage();
  return 0;
 }
 //------------------------------------------------------------------------------
@@ -703,37 +744,6 @@ uint8_t AVCLan_SendAnswerFrame(uint8_t *cmd)
  	return AVCLan_SendData();
  else 
  	return AVCLan_SendDataBroadcast();
-}
-//------------------------------------------------------------------------------
-uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len)
-{
- uint8_t i;
- uint8_t *c;
- 
- c = data_tmp;
- 
- data_control = 0xF;
- data_len	 = s_len;
- for (i=0; i<data_len; i++) {
- 	data[i]= *c++;
- }
- return AVCLan_SendData();
-}
-//------------------------------------------------------------------------------
-uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len)
-{
- uint8_t i;
- uint8_t *c;
- 
-
- c = data_tmp;
- 
- data_control = 0xF;
- data_len	 = s_len;
- for (i=0; i<data_len; i++) {
- 	data[i]= *c++;
- }
- return AVCLan_SendDataBroadcast();
 }
 //------------------------------------------------------------------------------
 uint8_t AVCLan_SendInitCommands()
@@ -803,7 +813,6 @@ uint8_t AVCLan_SendAnswer()
  	case cmCheck:		r = AVCLan_SendAnswerFrame((uint8_t*)CMD_CHECK); 
 						check_timeout = 0;
 						CMD_CHECK[6]++;
- 						RS232_Print("AVCCHK\n");
 						break;
  	case cmPlayReq1:	playMode = 0;
 						r = AVCLan_SendAnswerFrame((uint8_t*)CMD_PLAY_OK1); 
@@ -815,7 +824,6 @@ uint8_t AVCLan_SendAnswer()
 						CD_Mode = stPlay;
 						break;
 	case cmPlayIt:		playMode = 1;
-						RS232_Print("PLAY\n");
 						CMD_PLAY_OK4[7]=cd_Disc;
 						CMD_PLAY_OK4[8]=cd_Track;
 						CMD_PLAY_OK4[9]=cd_Time_Min;
@@ -843,26 +851,12 @@ uint8_t AVCLan_SendAnswer()
  return r;
 }
 //------------------------------------------------------------------------------
-void AVCLan_Register()
-{
- RS232_Print("REG_ST\n");
- AVCLan_SendAnswerFrame((uint8_t*)CMD_REGISTER); 
- RS232_Print("REG_END\n");
- //AVCLan_Command( cmRegister );
- AVCLan_Command( cmInit );
-}
-//------------------------------------------------------------------------------
 uint8_t	 AVCLan_Command(uint8_t command)
 {
  uint8_t r;
 
  answerReq = command;
  r = AVCLan_SendAnswer(); 
- /*
- RS232_Print("ret=");
- RS232_PrintHex8(r);
- RS232_Print("\n");
- */
  return r;
 }
 //------------------------------------------------------------------------------
@@ -873,69 +867,3 @@ uint8_t HexInc(uint8_t data)
  
  return (data+1);
 }
-//------------------------------------------------------------------------------
-uint8_t HexDec(uint8_t data)
-{
- if ((data & 0xF)==0) 
- 	return (data - 7);
- 
- return (data-1);
-}
-//------------------------------------------------------------------------------
-// encode decimal valute to 'toyota' format :-)
-//  ex.   42 (dec)   =  0x42 (toy)
-uint8_t Dec2Toy(uint8_t data)
-{
- uint8_t d,d1;
- d = (uint32_t)data/(uint32_t)10;
- d1 = d * 16;
- d  = d1 + (data - 10*d);
- return d;
-}
-//------------------------------------------------------------------------------
-void ShowInMessage()
-{
- if (message_len==0) return;
-
- AVC_HoldLine();
- 
-
- RS232_S((uintptr_t)PSTR("HU < ("));
-
- if (broadcast==0) RS232_S((uintptr_t)PSTR("bro) "));
- else RS232_Print("dir) ");
-
- RS232_PrintHex4(master1);
- RS232_PrintHex8(master2);
- RS232_Print("| ");
- RS232_PrintHex4(slave1);
- RS232_PrintHex8(slave2);
- RS232_Print("| ");
- 
- uint8_t i;
- for (i=0;i<message_len;i++) {
-	RS232_PrintHex8(message[i]);
-	RS232_Print(" ");
- }
- RS232_Print("\n");
-
- AVC_ReleaseLine();
-}
-//------------------------------------------------------------------------------
-void ShowOutMessage()
-{
- uint8_t i;
-
- AVC_HoldLine();
- 
- RS232_S((uintptr_t)PSTR("out > "));
- for (i=0; i<data_len; i++) {
-	RS232_PrintHex8(data[i]);
-	RS232_SendByte(' ');
- }
- RS232_Print("\n");
-
- AVC_ReleaseLine();
-}
-
-//------------------------------------------------------------------------------
