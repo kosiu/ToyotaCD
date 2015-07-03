@@ -40,8 +40,8 @@
 #define EV_NOTHING	0
 #define EV_STATUS	4
 
-// Hold event Type                                                                                                      
-uint8_t Event;                                                                                                          
+// Hold event Type
+uint8_t Event;
 
 
 void Setup();
@@ -52,55 +52,54 @@ void Setup();
 //
 int main() {
 
- Setup();
- 
- while (1) {
-   
-	if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
-  		AVCLan_Read_Message();
-	} else {
-		// check command from HU
-		if (answerReq != 0) AVCLan_SendAnswer();
-	}
+    Setup();
 
-	// HandleEvent
-	switch (Event) {
-	  case EV_STATUS: //recievd from timer interupt to send status
-		Event &= ~EV_STATUS; //clear event
-		AVCLan_Send_Status();
-		break;
-	}
+    while (1) {
 
- }
- return 0;
+        if (INPUT_IS_SET) {	 // if message from some device on AVCLan begin
+            AVCLan_Read_Message();
+        } else {
+            // check command from HU
+            if (answerReq != 0) AVCLan_SendAnswer();
+        }
+
+        // HandleEvent
+        switch (Event) {
+        case EV_STATUS: //recievd from timer interupt to send status
+            Event &= ~EV_STATUS; //clear event
+            AVCLan_Send_Status();
+            break;
+        }
+
+    }
+    return 0;
 }
 
 
 // -------------------------------------------------------------------------------------
 // Setup - uP: ATMega88(p)
 //
-void Setup()
-{
+void Setup() {
 
- CD_ID_1 = 0x03;
- CD_ID_2 = 0x60; //was cammera
+    CD_ID_1 = 0x03;
+    CD_ID_2 = 0x60; //was cammera
 
- HU_ID_1 = 0x01;
- HU_ID_2 = 0x60; //was 0x40
+    HU_ID_1 = 0x01;
+    HU_ID_2 = 0x60; //was 0x40
 
- MCUCR = 0; //turn on everything
- 
- //Clear Timer on Compare Mode
- TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode with 256 prescaler
- TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
+    MCUCR = 0; //turn on everything
 
- AVCLan_Init();
+//Clear Timer on Compare Mode
+    TCCR1B |= (1 << WGM12 | 1 << CS12); // Configure timer 1 for CTC mode with 256 prescaler
+    TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
 
- Event = EV_NOTHING;
- sei(); //enable global interupts
+    AVCLan_Init();
 
- //      T * osc. freq. / prescaler - 1 (error: 1s per 50h)
- OCR1A = 1 *   14745000 /       256 - 1; // Set CTC compare value
+    Event = EV_NOTHING;
+    sei(); //enable global interupts
+
+//      T * osc. freq. / prescaler - 1 (error: 1s per 50h)
+    OCR1A = 1 *   14745000 /       256 - 1; // Set CTC compare value
 
 }
 
@@ -110,20 +109,20 @@ void Setup()
 //Each second updating cd_Time_Sec and other...
 //then set Event for updating status
 ISR(TIMER1_COMPA_vect) {
-	cd_Time_Sec=HexInc(cd_Time_Sec);
-	if (cd_Time_Sec==0x60) {
-		cd_Time_Sec = 0;
-		cd_Time_Min=HexInc(cd_Time_Min);
-		if (cd_Time_Min==0x60) {
-			cd_Time_Min=0x0;
-			cd_Disc=HexInc(cd_Disc);
-		}
-		cd_Track = cd_Time_Min;
-	}
-	if (CD_Mode==stPlay) {
-		// set event to send status in main loop
-		Event |= EV_STATUS;
-	}
+    cd_Time_Sec=HexInc(cd_Time_Sec);
+    if (cd_Time_Sec==0x60) {
+        cd_Time_Sec = 0;
+        cd_Time_Min=HexInc(cd_Time_Min);
+        if (cd_Time_Min==0x60) {
+            cd_Time_Min=0x0;
+            cd_Disc=HexInc(cd_Disc);
+        }
+        cd_Track = cd_Time_Min;
+    }
+    if (CD_Mode==stPlay) {
+        // set event to send status in main loop
+        Event |= EV_STATUS;
+    }
 }
 
 

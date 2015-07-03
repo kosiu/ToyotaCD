@@ -108,21 +108,19 @@ uint8_t  HexInc(uint8_t data);
 
 //==================================================================================================
 // New struct
-typedef enum
-{
-  ia=0  
+typedef enum {
+    ia=0
 } AvcMsgID;
 
 
-typedef enum
-{   // No this is not a mistake, broadcast = 0!
+typedef enum {
+    // No this is not a mistake, broadcast = 0!
     MSG_NORMAL      = 1,
     MSG_BCAST       = 0
 
 } AvcMsgMode;
 
-typedef struct
-{
+typedef struct {
     AvcMsgID   ID;             // Message ID
     AvcMsgMode Mode;           // Transmission mode: normal (1) or broadcast (0).
     uint16_t   Master_ID;      // Sender ID
@@ -131,7 +129,7 @@ typedef struct
     uint8_t    Data[11];       // Payload data
     uint16_t   IgnoreMask;     // When reading which field can be ignored including Modes and IDs
     char       Description[17];// ASCII description of the command for terminal dump.
-    
+
 } AvcMessageStruct;
 
 extern uint16_t avcHU_Address;

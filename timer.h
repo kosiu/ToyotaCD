@@ -31,23 +31,21 @@
 #include <avr/io.h>
 
 enum {
-  STOP             = 0,
-  CK               = 1,
-  CK8              = 2,
-  CK64             = 3,
-  CK256            = 4,
-  CK1024           = 5,
-  T0_FALLING_EDGE  = 6,
-  T0_RISING_EDGE   = 7
+    STOP             = 0,
+    CK               = 1,
+    CK8              = 2,
+    CK64             = 3,
+    CK256            = 4,
+    CK1024           = 5,
+    T0_FALLING_EDGE  = 6,
+    T0_RISING_EDGE   = 7
 };
 
-static __inline__ void timer0_source (unsigned int src)
-{
+static __inline__ void timer0_source (unsigned int src) {
     TCCR0B = src;
 }
 
-static __inline__ void timer0_start (void)
-{
+static __inline__ void timer0_start (void) {
     TCNT0 = 1;
 }
 
