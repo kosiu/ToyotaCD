@@ -35,9 +35,8 @@
 // true if message from some device on AVCLan begin
 #define INPUT_IS_SET (ACSR & _BV(ACO))
 
-
 typedef enum { stStop=0, stPlay=1 } cd_modes;
-cd_modes CD_Mode;
+extern cd_modes CD_Mode;
 
 //-------------------------------------------------------------------------
 

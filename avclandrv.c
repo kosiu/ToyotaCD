@@ -35,24 +35,30 @@
 //------------------------------------------------------------------------------
 // Preprocesor Definitions
 
-#define AVC_OUT_EN()	sbi(PORTD, 6); sbi(DDRD, 6);  sbi(DDRD, 7); sbi(ACSR, ACD); 
-#define AVC_OUT_DIS()	cbi(PORTD, 6); cbi(DDRD, 6);  cbi(DDRD, 7); cbi(ACSR, ACD);
-#define AVC_SET_1()  	sbi(PORTD, 6);
-#define AVC_SET_0()  	cbi(PORTD, 6);
+#define sbi(port, bit) (port) |= (1 << (bit))                                                                           
+#define cbi(port, bit) (port) &= ~(1 << (bit))                                                                          
+
+//#define AVC_OUT_EN()	PORTD |=  _BV(6); DDRD |=   _BV(6) | _BV(7);  ACSR |=  _BV(ACD); 
+#define   AVC_OUT_EN()    sbi(PORTD, 6); sbi(DDRD, 6);  sbi(DDRD, 7); sbi(ACSR, ACD);
+//#define AVC_OUT_DIS()   PORTD &= ~_BV(6); DDRD &= ~(_BV(6) | _BV(7)); ACSR &= ~_BV(ACD); 
+#define   AVC_OUT_DIS()	cbi(PORTD, 6); cbi(DDRD, 6);  cbi(DDRD, 7); cbi(ACSR, ACD);
+//#define AVC_SET_1()   PORTD |=  _BV(6);
+#define   AVC_SET_1()  	sbi(PORTD, 6);
+//#define AVC_SET_0()   PORTD &= ~_BV(6);
+#define   AVC_SET_0()  	cbi(PORTD, 6);
 
 /* Private macro */
 #define INPUT_IS_CLEAR (!(ACSR & _BV(ACO)))
 
 // Private timers interupt on off to be checked
+//#define STOPEvent TIMSK1 &= ~_BV(TOIE1); UCSR0B &= ~_BV(RXCIE0);
 #define STOPEvent  cbi(TIMSK1, TOIE1); cbi(UCSR0B, RXCIE0);
 // Private timers interupt on off to be checked
+//#define STARTEvent TIMSK1 |= _BV(TOIE1); UCSR0B |= _BV(RXCIE0);
 #define STARTEvent sbi(TIMSK1, TOIE1); sbi(UCSR0B, RXCIE0);
 
 // Check and read Message                                                                                                                  
 #define CHECK_AVC_LINE  if (INPUT_IS_SET) AVCLan_Read_Message();                                                                             
-
-
-
 #define MAXMSGLEN	32
 
 // Commands:
@@ -68,14 +74,6 @@
 #define cmCheck		102 //0x66
 #define cmPlayIt	103 //0x67
 #define cmBeep		110 //0x6E
-
-#define cmNextTrack	120 //0x78
-#define cmPrevTrack	121 //0x79
-#define cmNextDisc	122 //0x7A
-#define cmPrevDisc	123 //0x7B
-
-#define cmScanModeOn	130 //0x82
-#define cmScanModeOff	131 //0x83
 
 #define cmPlayReq1	5
 #define cmPlayReq2	6
@@ -98,6 +96,7 @@ uint8_t cd_Time_Min;
 uint8_t cd_Time_Sec;
 
 uint8_t playMode;
+cd_modes CD_Mode;
 
 // if answer requested
 uint8_t answerReq;
@@ -126,7 +125,6 @@ uint8_t randomMode;
 uint8_t check_timeout;
 
 //---------------------------------------------------
-#define SW_ID	0x12
 
 // commands
 const uint8_t stat1[]       = { 0x4, 0x00, 0x00, 0x01, 0x0A };
@@ -135,52 +133,40 @@ const uint8_t stat3[]       = { 0x4, 0x00, 0x00, 0x01, 0x0D };
 const uint8_t stat4[]       = { 0x4, 0x00, 0x00, 0x01, 0x0C };
 // broadcast
 const uint8_t lan_stat1[]   = { 0x3, 0x00, 0x01, 0x0A };
-const uint8_t lan_reg[]     = { 0x3,SW_ID, 0x01, 0x00 };
-const uint8_t lan_init[]    = { 0x3,SW_ID, 0x01, 0x01 };
-const uint8_t lan_check[]   = { 0x3,SW_ID, 0x01, 0x20 };
-const uint8_t lan_playit[]  = { 0x4,SW_ID, 0x01, 0x45, 0x63 };
+const uint8_t lan_reg[]     = { 0x3,0x12, 0x01, 0x00 };
+const uint8_t lan_init[]    = { 0x3,0x12, 0x01, 0x01 };
+const uint8_t lan_check[]   = { 0x3,0x12, 0x01, 0x20 };
+const uint8_t lan_playit[]  = { 0x4,0x12, 0x01, 0x45, 0x63 };
 const uint8_t play_req1[]   = { 0x4, 0x00, 0x25, 0x63, 0x80 };
 #ifdef __AVENSIS__
-const uint8_t play_req2[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42 };
+const uint8_t play_req2[]   = { 0x6, 0x00,0x12, 0x63, 0x42 };
 #else
-const uint8_t play_req2[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42, 0x01, 0x00 };
+const uint8_t play_req2[]   = { 0x6, 0x00,0x12, 0x63, 0x42, 0x01, 0x00 };
 #endif
-const uint8_t play_req3[]   = { 0x6, 0x00,SW_ID, 0x63, 0x42, 0x41, 0x00 };
-const uint8_t stop_req[]    = { 0x5, 0x00,SW_ID, 0x63, 0x43, 0x01 };
-const uint8_t stop_req2[]   = { 0x5, 0x00,SW_ID, 0x63, 0x43, 0x41 };
+const uint8_t play_req3[]   = { 0x6, 0x00,0x12, 0x63, 0x42, 0x41, 0x00 };
+const uint8_t stop_req[]    = { 0x5, 0x00,0x12, 0x63, 0x43, 0x01 };
+const uint8_t stop_req2[]   = { 0x5, 0x00,0x12, 0x63, 0x43, 0x41 };
 const uint8_t btn_scan[]    = { 0x4, 0x00, 0x25, 0x63, 0x95 };
 // answers
-const uint8_t CMD_REGISTER[]= { 0x1, 0x05, 0x00, 0x01,SW_ID, 0x10, 0x63 };
+const uint8_t CMD_REGISTER[]= { 0x1, 0x05, 0x00, 0x01,0x12, 0x10, 0x63 };
 const uint8_t CMD_STATUS1[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x1A };
 const uint8_t CMD_STATUS2[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x18 };
 const uint8_t CMD_STATUS3[] = { 0x1, 0x04, 0x00, 0x01, 0x00, 0x1D };
 const uint8_t CMD_STATUS4[] = { 0x1, 0x05, 0x00, 0x01, 0x00, 0x1C, 0x00 };
-      uint8_t CMD_CHECK[]   = { 0x1, 0x06, 0x00, 0x01,SW_ID, 0x30, 0x00, 0x00 };
+      uint8_t CMD_CHECK[]   = { 0x1, 0x06, 0x00, 0x01,0x12, 0x30, 0x00, 0x00 };
 const uint8_t CMD_STATUS5[] = { 0x1, 0x05, 0x00, 0x5C, 0x12, 0x53, 0x02 };
 const uint8_t CMD_STATUS5A[]= { 0x0, 0x05, 0x5C, 0x31, 0xF1, 0x00, 0x00 };
 const uint8_t CMD_STATUS6[] = { 0x1, 0x06, 0x00, 0x5C, 0x32, 0xF0, 0x02, 0x00 };
-const uint8_t CMD_PLAY_OK1[]= { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x50, 0x01 };
-const uint8_t CMD_PLAY_OK2[]= { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x52, 0x01 };
+const uint8_t CMD_PLAY_OK1[]= { 0x1, 0x05, 0x00, 0x63,0x12, 0x50, 0x01 };
+const uint8_t CMD_PLAY_OK2[]= { 0x1, 0x05, 0x00, 0x63,0x12, 0x52, 0x01 };
 const uint8_t CMD_PLAY_OK3[]= { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
       uint8_t CMD_PLAY_OK4[]= { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 };
-const uint8_t CMD_STOP1[]   = { 0x1, 0x05, 0x00, 0x63,SW_ID, 0x53, 0x01 };
+const uint8_t CMD_STOP1[]   = { 0x1, 0x05, 0x00, 0x63,0x12, 0x53, 0x01 };
       uint8_t CMD_STOP2[]   = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x30, 0x00, 0x00,0x00, 0x00, 0x00, 0x80 };
 const uint8_t CMD_BEEP[]    = { 0x1, 0x05, 0x00, 0x63, 0x29, 0x60, 0x02 };
 
 //------------------------------------------------------------------------------
 // Functions Declaration
-
-
-/* Sends only register line */
-void AVCLan_Register();
-
-/*  Public function uint8_t AVCLan_SendData()
-  Sends data using the same variables:
-  master1 & 2
-  slave1 & 2
-  message_len
-  message[] */
-uint8_t  AVCLan_SendData();
 
 /*  Public function uint8_t AVCLan_SendData()
   Sends data using the same variables:
@@ -190,20 +176,10 @@ uint8_t  AVCLan_SendData();
   message[] */
 uint8_t  AVCLan_SendDataBroadcast();
 
-// Send command eg: cmBeep
-uint8_t  AVCLan_Command(uint8_t command);
-
-
-// Public: Function send message
-uint8_t AVCLan_SendMyData(uint8_t *data_tmp, uint8_t s_len);
-// Public: Function send brodcast massage
-uint8_t AVCLan_SendMyDataBroadcast(uint8_t *data_tmp, uint8_t s_len);
-
 // Private: block line eg. you can't read
 void AVC_HoldLine();
 // Private: (not used in main program)
 void AVC_ReleaseLine();
-
 
 // compare what is in the global varibale message[] with comand from argument
 // return:
@@ -218,12 +194,7 @@ uint8_t AVCLan_SendAnswerFrame(uint8_t *cmd);
 // this is kind of the test sends different commands and chack if there is any answer
 uint8_t AVCLan_SendInitCommands();
 
-uint8_t  HexDec(uint8_t data);
-uint8_t  Dec2Toy(uint8_t data);
-
 // more atomic functions (hardware layer)
-void AVC_HoldLine(); 				     // Low Level function
-void AVC_ReleaseLine(); 			     // Low Level function
 uint8_t AVCLan_Read_Byte(uint8_t length);	     // Low Level function
 uint8_t AVCLan_Send_StartBit(); 		     // Low Level function
 void AVCLan_Send_Bit1(); 			     // Low Level function
@@ -277,15 +248,22 @@ void AVCLan_Init()
  
   
  // OUTPUT ( set as input for comparator )
+ // AVC_OUT_DIS()
+ // -
  cbi(PORTD, 6);
  cbi(DDRD, 6);
 
  // INPUT
+ // PORTD &= ~_BV(7)
+ // -
  cbi(PORTD, 7);
  cbi(DDRD, 7);
 
  // Analog comparator
- 
+ //ADCSRB &= ~_BV(ACME)
+ //ACSR &= ~( _BV(ACIS1) | _BV(ACIS0) )
+ // -
+ // -
  cbi(ADCSRB, ACME);	// Analog Comparator Multiplexer Enable - NO
  cbi(ACSR, ACIS1);	// Analog Comparator Interrupt Mode Select
  cbi(ACSR, ACIS0);	// Comparator Interrupt on Output Toggle
@@ -751,26 +729,8 @@ uint8_t AVCLan_SendInitCommands()
  uint8_t r;
 
  const uint8_t c1[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
- const uint8_t c2[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x02 };
- const uint8_t c3[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3F, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t c4[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x3D, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t c5[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x39, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t c6[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x31, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t c7[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x21, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t c8[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x90, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
- const uint8_t c9[] = { 0x0, 0x0A, 0x63, 0x31, 0xF3, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02 };
- const uint8_t cA[] = { 0x0, 0x0B, 0x63, 0x31, 0xF1, 0x00, 0x30, 0x01, 0xFF, 0xFF, 0xFF, 0x00, 0x80 };
 
  r = AVCLan_SendAnswerFrame((uint8_t*)c1);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c2);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c3);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c4);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c5);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c6);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c7);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c8);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)c9);
- if (!r) r = AVCLan_SendAnswerFrame((uint8_t*)cA);
 
  return r;
 }
@@ -789,7 +749,6 @@ void AVCLan_Send_Status()
 
  AVCLan_SendAnswerFrame((uint8_t*)STATUS);
 }
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 uint8_t AVCLan_SendAnswer()
@@ -848,15 +807,6 @@ uint8_t AVCLan_SendAnswer()
  }
 
  answerReq = cmNull;
- return r;
-}
-//------------------------------------------------------------------------------
-uint8_t	 AVCLan_Command(uint8_t command)
-{
- uint8_t r;
-
- answerReq = command;
- r = AVCLan_SendAnswer(); 
  return r;
 }
 //------------------------------------------------------------------------------
